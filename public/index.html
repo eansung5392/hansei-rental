@@ -114,7 +114,17 @@
 
   function submitRent() {
     if(!selectedFac) { alert("장소를 선택해주세요!"); return; }
-    bookings.push({ date: document.getElementById('rent-date').value, fac: selectedFac, name: document.getElementById('name').value });
+    
+    const newBooking = {
+      date: document.getElementById('rent-date').value,
+      fac: selectedFac,
+      group: document.getElementById('group').value,
+      name: document.getElementById('name').value,
+      phone: document.getElementById('phone').value,
+      memo: document.getElementById('memo').value
+    };
+
+    bookings.push(newBooking);
     localStorage.setItem('myBookings', JSON.stringify(bookings));
     alert('신청이 완료되었습니다!');
   }
@@ -123,7 +133,14 @@
     if(document.getElementById('pw').value === '1234') {
       document.getElementById('admin-box').style.display = 'block';
       document.getElementById('login-box').style.display = 'none';
-      document.getElementById('booking-list').innerHTML = bookings.map(b => `<div>${b.date} / ${b.fac} / 신청자: ${b.name}</div>`).join('') || "예약 없음";
+      
+      document.getElementById('booking-list').innerHTML = bookings.map(b => `
+        <div style="border-bottom:1px solid #ccc; padding:10px; margin-bottom:5px;">
+          <b>[${b.date}] ${b.fac}</b><br>
+          소속: ${b.group} | 성명: ${b.name} | 연락처: ${b.phone}<br>
+          메모: ${b.memo}
+        </div>
+      `).join('') || "현재 접수된 예약이 없습니다.";
     } else alert('비밀번호 오류');
   }
 
