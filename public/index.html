@@ -1,61 +1,121 @@
-<div id="page-admin" class="page">
-  <div id="login-box">
-    <input type="password" id="pw" placeholder="비밀번호">
-    <button onclick="checkAdmin()">로그인</button>
-  </div>
-  
-  <div id="admin-box" style="display:none;">
-    <h3>관리자 대시보드</h3>
-    
-    <h4>예약 현황 리스트</h4>
-    <div id="admin-booking-list" style="border:1px solid #ccc; padding:10px; margin-bottom:20px;">
-      <p>조회된 예약이 없습니다.</p>
-    </div>
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <title>한세대학교 대관시스템</title>
+  <style>
+    :root { --primary-color: #002F6C; --secondary-color: #8A7355; }
+    body { font-family: 'Malgun Gothic', sans-serif; margin: 0; padding: 0; background: #f4f6f9; }
+    header { background: #FFF; padding: 20px; text-align: center; border-bottom: 3px solid var(--secondary-color); }
+    .nav-tabs { display: flex; justify-content: center; background-color: var(--primary-color); }
+    .tab-btn { padding: 15px 30px; border: none; color: #FFF; font-weight: bold; cursor: pointer; background: none; }
+    .tab-btn.active { background-color: var(--secondary-color); }
+    .container { max-width: 800px; margin: 20px auto; padding: 20px; background: #FFF; border-radius: 8px; }
+    .page { display: none; }
+    .page.active { display: block; }
+    .step { margin-bottom: 25px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+    .card { padding: 15px; border: 1px solid #ccc; margin: 5px 0; cursor: pointer; }
+    .card.selected { border: 2px solid var(--primary-color); background: #eef; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
+  </style>
+</head>
+<body>
 
-    <hr>
-    
-    <h4>시설 및 금액 관리</h4>
-    <div id="admin-facility-list"></div>
+<header><h1>HANSEI UNIVERSITY 대관시스템</h1></header>
+<nav class="nav-tabs">
+  <button class="tab-btn active" onclick="switchTab('rent')">대관 신청하기</button>
+  <button class="tab-btn" onclick="switchTab('admin')">관리자 대시보드</button>
+</nav>
+
+<div class="container">
+  <div id="page-rent" class="page active">
+    <div class="step">
+      <b>1. 대관 일자 선택</b><br><input type="date" id="rent-date">
     </div>
+    <div class="step">
+      <b>2. 대관 장소 선택</b><div id="facility-list"></div>
+    </div>
+    <div class="step">
+      <b>3. 신청 정보 입력</b>
+      <input type="text" id="group" placeholder="소속/단체명">
+      <input type="text" id="name" placeholder="성명">
+      <input type="text" id="phone" placeholder="연락처">
+      <textarea id="memo" placeholder="메모/요청사항"></textarea>
+    </div>
+    <button onclick="submitRent()" style="width:100%; padding:15px; background:var(--primary-color); color:white; border:none; cursor:pointer;">신청 완료</button>
+  </div>
+
+  <div id="page-admin" class="page">
+    <div id="login-box">
+      <input type="password" id="pw" placeholder="비밀번호"><button onclick="checkAdmin()">로그인</button>
+    </div>
+    <div id="admin-box" style="display:none;">
+      <h3>예약 현황</h3>
+      <div id="booking-list" style="border:1px solid #ddd; padding:10px; margin-bottom:20px;"></div>
+      <h3>시설 및 금액 관리</h3>
+      <div id="admin-facility-list"></div>
+      <div style="margin-top:20px;">
+        <input type="text" id="new-name" placeholder="시설명">
+        <input type="text" id="new-fee" placeholder="이용료">
+        <button onclick="addFacility()">시설 추가</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
-  // 신청된 데이터를 저장할 배열 (실제 서버가 없으므로 로컬 메모리 활용)
-  let bookings = []; 
+  let facilities = [{id:1, name:'본관 대강당', fee:'300,000원'}, {id:2, name:'실내체육관', fee:'200,000원'}];
+  let bookings = [];
+  let selectedFac = "";
 
-  // 대관 신청 시 데이터 저장
+  function switchTab(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('page-'+id).classList.add('active');
+    event.target.classList.add('active');
+  }
+
+  function renderUI() {
+    // 신청 페이지 장소 렌더링
+    const list = document.getElementById('facility-list');
+    list.innerHTML = facilities.map(f => `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} (${f.fee})</div>`).join('');
+    
+    // 관리자 페이지 시설 렌더링
+    document.getElementById('admin-facility-list').innerHTML = facilities.map(f => `
+      <div style="margin:5px 0;">${f.name} - ${f.fee} <button onclick="delFacility(${f.id})">삭제</button></div>
+    `).join('');
+  }
+
+  function selectFac(el, name) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedFac = name;
+  }
+
   function submitRent() {
-    const data = {
-      date: document.getElementById('rent-date').value,
-      group: document.getElementById('group').value,
-      name: document.getElementById('name').value,
-      phone: document.getElementById('phone').value
-    };
-    bookings.push(data); // 배열에 추가
-    alert('신청이 완료되었습니다!');
+    bookings.push({date: document.getElementById('rent-date').value, fac: selectedFac, name: document.getElementById('name').value});
+    alert('신청되었습니다!');
   }
 
-  // 관리자 모드에서 예약 리스트 렌더링
-  function renderBookings() {
-    const list = document.getElementById('admin-booking-list');
-    if(bookings.length === 0) {
-      list.innerHTML = "<p>현재 접수된 예약이 없습니다.</p>";
-    } else {
-      list.innerHTML = bookings.map(b => `
-        <div style="border-bottom:1px solid #eee; padding:5px;">
-          [${b.date}] ${b.group} - ${b.name} (${b.phone})
-        </div>
-      `).join('');
-    }
-  }
-
-  // checkAdmin 함수 내부에 추가
   function checkAdmin() {
     if(document.getElementById('pw').value === '1234') {
       document.getElementById('admin-box').style.display = 'block';
       document.getElementById('login-box').style.display = 'none';
-      renderList();
-      renderBookings(); // 관리자 로그인 시 예약 내역도 로드
-    } else alert('비밀번호가 틀렸습니다.');
+      document.getElementById('booking-list').innerHTML = bookings.map(b => `<div>${b.date} / ${b.fac} / 신청자: ${b.name}</div>`).join('') || "예약 없음";
+    } else alert('비밀번호 오류');
   }
+
+  function addFacility() {
+    facilities.push({id: Date.now(), name: document.getElementById('new-name').value, fee: document.getElementById('new-fee').value});
+    renderUI();
+  }
+
+  function delFacility(id) {
+    facilities = facilities.filter(f => f.id !== id);
+    renderUI();
+  }
+
+  renderUI();
 </script>
+</body>
+</html>
