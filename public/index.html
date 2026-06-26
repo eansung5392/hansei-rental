@@ -57,36 +57,30 @@
       { id: 3, name: '국제세미나실', fee: '120,000원' }
     ];
 
-    // 탭 전환
+    // 탭 전환 로직
     function switchTab(tabId) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       
-      // 클릭한 탭 활성화
+      // 클릭된 버튼 찾아서 active 추가
       event.target.classList.add('active');
       document.getElementById('page-' + tabId).classList.add('active');
     }
 
-    // 시설 카드 그리기
+    // 시설 카드 렌더링 로직
     function renderFacilities() {
       const cardDiv = document.getElementById('facility-cards');
-      const dateVal = document.getElementById('input-date').value;
-      
-      if (!dateVal) {
-        cardDiv.innerHTML = "<p>먼저 날짜를 선택해 주세요.</p>";
-        return;
-      }
-
       cardDiv.innerHTML = facilities.map(f => `
-        <div class="card" onclick="alert('${f.name}을(를) 선택하셨습니다.')">
+        <div class="card" onclick="alert('${f.name} 선택됨')">
           <strong>${f.name}</strong><br><span>이용료: ${f.fee}</span>
         </div>
       `).join('');
     }
 
-    // 초기 실행
+    // 초기화 함수
     window.onload = function() {
       document.getElementById('input-date').value = new Date().toISOString().split('T')[0];
+      renderFacilities();
     };
   </script>
 </body>
