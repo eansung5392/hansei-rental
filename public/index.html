@@ -4,37 +4,41 @@
   <meta charset="UTF-8">
   <title>한세대학교 대관시스템</title>
   <style>
-    :root { --primary-color: #002F6C; --secondary-color: #8A7355; }
-    body { font-family: 'Malgun Gothic', sans-serif; background: #F4F6F9; padding: 20px; }
-    .container { max-width: 700px; margin: auto; background: #FFF; padding: 30px; border-radius: 12px; }
+    :root { --primary-color: #002F6C; --secondary-color: #8A7355; --bg-light: #F4F6F9; }
+    body { font-family: 'Malgun Gothic', sans-serif; background: var(--bg-light); padding: 20px; }
+    .container { max-width: 700px; margin: auto; background: #FFF; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     .page { display: none; } .page.active { display: block; }
     .notice-box { background: #FFFDE7; border: 1px solid #FFE082; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
-    button { padding: 10px; background: #002F6C; color: white; border: none; cursor: pointer; width: 100%; }
-    .step-box { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
-    .card { padding: 10px; border: 1px solid #ccc; margin: 5px 0; cursor: pointer; }
-    .card.selected { background: #eef; border: 2px solid #002F6C; }
+    .step-box { margin-bottom: 25px; padding: 20px; border: 1px solid #e1e4e8; border-radius: 8px; background: #fafafa; }
+    .step-title { display: block; font-size: 1.1em; color: var(--primary-color); margin-bottom: 15px; font-weight: bold; border-left: 4px solid var(--primary-color); padding-left: 10px; }
+    .card { padding: 15px; border: 1px solid #ccc; margin: 8px 0; cursor: pointer; border-radius: 6px; }
+    .card.selected { border: 2px solid var(--primary-color); background: #eef; }
+    input, textarea { width: 100%; padding: 12px; margin-top: 8px; box-sizing: border-box; }
+    button { cursor: pointer; padding: 12px; border: none; background: var(--primary-color); color: white; border-radius: 6px; width: 100%; font-weight: bold; }
   </style>
 </head>
 <body>
 
 <nav style="text-align:center; margin-bottom:20px;">
-  <button onclick="switchTab('rent')" style="width:auto;">대관 신청하기</button>
-  <button onclick="switchTab('admin')" style="width:auto;">관리자 대시보드</button>
+  <button onclick="switchTab('rent')" style="width:auto; background:var(--secondary-color);">대관 신청하기</button>
+  <button onclick="switchTab('admin')" style="width:auto; background:var(--primary-color);">관리자 대시보드</button>
 </nav>
 
 <div class="container">
   <div id="page-rent" class="page active">
     <h3>대관 신청</h3>
     <div class="notice-box" id="display-notice"></div>
-    
     <div class="step-box">
-      일자: <input type="date" id="rent-date">
+      <span class="step-title">1. 일자 선택</span>
+      <input type="date" id="rent-date">
     </div>
     <div class="step-box">
-      장소: <div id="facility-list"></div>
+      <span class="step-title">2. 장소 선택</span>
+      <div id="facility-list"></div>
     </div>
     <div class="step-box">
-      정보: <input type="text" id="group" placeholder="소속">
+      <span class="step-title">3. 정보 입력</span>
+      <input type="text" id="group" placeholder="소속">
       <input type="text" id="name" placeholder="성명">
       <input type="text" id="phone" placeholder="연락처">
       <textarea id="memo" placeholder="메모"></textarea>
@@ -48,10 +52,9 @@
       <button onclick="checkAdmin()">로그인</button>
     </div>
     <div id="admin-box" style="display:none;">
-      <h3>공지사항 수정</h3>
-      <textarea id="edit-notice" placeholder="공지사항을 입력하세요"></textarea>
+      <h3>공지사항 관리</h3>
+      <textarea id="edit-notice"></textarea>
       <button onclick="saveNotice()" style="background:#555;">공지사항 저장</button>
-      
       <h3>예약 현황</h3>
       <div id="booking-list"></div>
       <button onclick="downloadExcel()" style="background:#28a745; margin-top:10px;">엑셀 다운로드</button>
@@ -60,32 +63,39 @@
 </div>
 
 <script>
-  // 초기화 및 데이터 로드
+  // 데이터 초기화
+  let facilities = [{id:1, name:'본관 대강당', fee:'300,000원'}, {id:2, name:'실내체육관', fee:'200,000원'}];
   let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-  let notice = localStorage.getItem('notice') || "• 공지사항이 없습니다.";
+  let notice = localStorage.getItem('notice') || "공지사항을 입력해주세요.";
+  let selectedFac = "";
 
-  // 공지사항 표시 및 수정창 초기화
+  // 화면 초기 로드
   document.getElementById('display-notice').innerText = notice;
   document.getElementById('edit-notice').value = notice;
+  document.getElementById('facility-list').innerHTML = facilities.map(f => 
+    `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} (${f.fee})</div>`).join('');
 
   function switchTab(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
     document.getElementById('page-'+id).classList.add('active');
   }
 
+  function selectFac(el, name) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedFac = name;
+  }
+
   function saveNotice() {
     let newNotice = document.getElementById('edit-notice').value;
     localStorage.setItem('notice', newNotice);
     document.getElementById('display-notice').innerText = newNotice;
-    alert('공지사항이 적용되었습니다!');
+    alert('저장됨!');
   }
 
   function submitRent() {
-    bookings.push({
-      date: document.getElementById('rent-date').value,
-      fac: window.selectedFac,
-      name: document.getElementById('name').value
-    });
+    if(!selectedFac) return alert("장소를 선택하세요!");
+    bookings.push({ date: document.getElementById('rent-date').value, fac: selectedFac, name: document.getElementById('name').value });
     localStorage.setItem('bookings', JSON.stringify(bookings));
     alert('신청 완료!');
   }
@@ -94,7 +104,7 @@
     if(document.getElementById('admin-pw').value === '1234') {
       document.getElementById('admin-box').style.display = 'block';
       document.getElementById('login-box').style.display = 'none';
-      document.getElementById('booking-list').innerHTML = bookings.map(b => `<div>[${b.date}] ${b.fac} / ${b.name}</div>`).join('');
+      document.getElementById('booking-list').innerHTML = bookings.map(b => `<div>${b.date} / ${b.fac} / ${b.name}</div>`).join('');
     } else alert('비밀번호 오류');
   }
 
