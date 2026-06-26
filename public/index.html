@@ -4,165 +4,107 @@
   <meta charset="UTF-8">
   <title>한세대학교 대관시스템</title>
   <style>
-    :root { --primary-color: #002F6C; --secondary-color: #8A7355; --bg-light: #F4F6F9; }
-    body { font-family: 'Malgun Gothic', sans-serif; margin: 0; background: var(--bg-light); padding-bottom: 50px; }
-    header { background: #FFF; padding: 25px; text-align: center; border-bottom: 3px solid var(--secondary-color); }
-    h1 { color: var(--primary-color); margin: 0; }
-    .nav-tabs { display: flex; justify-content: center; background-color: var(--primary-color); }
-    .tab-btn { padding: 15px 30px; border: none; color: #FFF; font-weight: bold; cursor: pointer; background: none; }
-    .tab-btn.active { background-color: var(--secondary-color); }
-    .container { max-width: 700px; margin: 30px auto; padding: 30px; background: #FFF; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    :root { --primary-color: #002F6C; --secondary-color: #8A7355; }
+    body { font-family: 'Malgun Gothic', sans-serif; background: #F4F6F9; padding: 20px; }
+    .container { max-width: 700px; margin: auto; background: #FFF; padding: 30px; border-radius: 12px; }
     .page { display: none; } .page.active { display: block; }
-    .step-box { margin-bottom: 30px; padding: 20px; border: 1px solid #e1e4e8; border-radius: 8px; background: #fafafa; }
-    .step-title { display: block; font-size: 1.1em; color: var(--primary-color); margin-bottom: 15px; font-weight: bold; border-left: 4px solid var(--primary-color); padding-left: 10px; }
-    .card { padding: 15px; border: 1px solid #ccc; margin: 8px 0; cursor: pointer; border-radius: 6px; }
-    .card.selected { border: 2px solid var(--primary-color); background: #eef; }
-    input, textarea { width: 100%; padding: 12px; margin-top: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-    button { cursor: pointer; padding: 12px; border: none; background: var(--primary-color); color: white; border-radius: 6px; font-weight: bold; width: 100%; margin-top: 10px; }
+    .notice-box { background: #FFFDE7; border: 1px solid #FFE082; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+    button { padding: 10px; background: #002F6C; color: white; border: none; cursor: pointer; width: 100%; }
+    .step-box { margin-bottom: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 8px; }
+    .card { padding: 10px; border: 1px solid #ccc; margin: 5px 0; cursor: pointer; }
+    .card.selected { background: #eef; border: 2px solid #002F6C; }
   </style>
 </head>
 <body>
 
-<header><h1>HANSEI UNIVERSITY 대관시스템</h1></header>
-<nav class="nav-tabs">
-  <button class="tab-btn active" onclick="switchTab('rent')">대관 신청하기</button>
-  <button class="tab-btn" onclick="switchTab('admin')">관리자 대시보드</button>
+<nav style="text-align:center; margin-bottom:20px;">
+  <button onclick="switchTab('rent')" style="width:auto;">대관 신청하기</button>
+  <button onclick="switchTab('admin')" style="width:auto;">관리자 대시보드</button>
 </nav>
 
 <div class="container">
   <div id="page-rent" class="page active">
+    <h3>대관 신청</h3>
+    <div class="notice-box" id="display-notice"></div>
+    
     <div class="step-box">
-      <span class="step-title">1. 대관 일자 선택</span>
-      <input type="date" id="rent-date">
+      일자: <input type="date" id="rent-date">
     </div>
     <div class="step-box">
-      <span class="step-title">2. 대관 장소 선택</span>
-      <div id="facility-list"></div>
+      장소: <div id="facility-list"></div>
     </div>
     <div class="step-box">
-      <span class="step-title">3. 신청 정보 입력</span>
-      <input type="text" id="group" placeholder="소속/단체명">
+      정보: <input type="text" id="group" placeholder="소속">
       <input type="text" id="name" placeholder="성명">
       <input type="text" id="phone" placeholder="연락처">
-      <textarea id="memo" placeholder="메모/요청사항" rows="3"></textarea>
+      <textarea id="memo" placeholder="메모"></textarea>
     </div>
     <button onclick="submitRent()">신청 완료</button>
   </div>
 
   <div id="page-admin" class="page">
-    <div id="login-box" class="step-box">
-      <span class="step-title">관리자 로그인</span>
+    <div id="login-box">
       <input type="password" id="admin-pw" placeholder="비밀번호">
       <button onclick="checkAdmin()">로그인</button>
     </div>
     <div id="admin-box" style="display:none;">
-      <h3>공지사항 관리</h3>
-      <textarea id="new-notice-text" placeholder="공지사항 내용을 입력하세요"></textarea>
-      <button onclick="updateNotice()">공지사항 적용</button>
+      <h3>공지사항 수정</h3>
+      <textarea id="edit-notice" placeholder="공지사항을 입력하세요"></textarea>
+      <button onclick="saveNotice()" style="background:#555;">공지사항 저장</button>
       
-      <hr style="margin:20px 0;">
-      
-      <h3>예약 현황 <button onclick="downloadExcel()" style="background:#28a745; width:auto;">엑셀 다운로드</button></h3>
+      <h3>예약 현황</h3>
       <div id="booking-list"></div>
-      
-      <hr style="margin:20px 0;">
-      
-      <h3>시설 관리</h3>
-      <div id="admin-facility-list"></div>
-      <input type="text" id="new-name" placeholder="시설명">
-      <input type="text" id="new-fee" placeholder="이용료">
-      <button onclick="addFacility()">시설 추가</button>
+      <button onclick="downloadExcel()" style="background:#28a745; margin-top:10px;">엑셀 다운로드</button>
     </div>
   </div>
 </div>
 
 <script>
-  let facilities = JSON.parse(localStorage.getItem('facilities')) || [{id:1, name:'본관 대강당', fee:'300,000원'}];
+  // 초기화 및 데이터 로드
   let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-  let selectedFac = "";
+  let notice = localStorage.getItem('notice') || "• 공지사항이 없습니다.";
+
+  // 공지사항 표시 및 수정창 초기화
+  document.getElementById('display-notice').innerText = notice;
+  document.getElementById('edit-notice').value = notice;
 
   function switchTab(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('page-'+id).classList.add('active');
-    event.target.classList.add('active');
   }
 
-  function selectFac(el, name) {
-    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-    selectedFac = name;
-  }
-
-  function updateNotice() {
-    localStorage.setItem('notice', document.getElementById('new-notice-text').value);
-    alert('공지사항이 저장되었습니다.');
+  function saveNotice() {
+    let newNotice = document.getElementById('edit-notice').value;
+    localStorage.setItem('notice', newNotice);
+    document.getElementById('display-notice').innerText = newNotice;
+    alert('공지사항이 적용되었습니다!');
   }
 
   function submitRent() {
-    if(!selectedFac) return alert("장소를 선택해주세요.");
     bookings.push({
-      id: Date.now(),
       date: document.getElementById('rent-date').value,
-      fac: selectedFac,
-      group: document.getElementById('group').value,
-      name: document.getElementById('name').value,
-      phone: document.getElementById('phone').value,
-      memo: document.getElementById('memo').value
+      fac: window.selectedFac,
+      name: document.getElementById('name').value
     });
     localStorage.setItem('bookings', JSON.stringify(bookings));
-    alert('신청이 완료되었습니다!');
+    alert('신청 완료!');
   }
 
   function checkAdmin() {
     if(document.getElementById('admin-pw').value === '1234') {
       document.getElementById('admin-box').style.display = 'block';
       document.getElementById('login-box').style.display = 'none';
-      renderBookings();
-      renderAdminFacilities();
+      document.getElementById('booking-list').innerHTML = bookings.map(b => `<div>[${b.date}] ${b.fac} / ${b.name}</div>`).join('');
     } else alert('비밀번호 오류');
   }
 
-  function renderBookings() {
-    document.getElementById('booking-list').innerHTML = bookings.map(b => 
-      `<div style="border-bottom:1px solid #ccc; padding:10px;"><b>[${b.date}] ${b.fac}</b> <button onclick="delBooking(${b.id})" style="background:#cc0000; width:auto; padding:5px;">삭제</button><br>소속:${b.group} / 성명:${b.name} / 연락처:${b.phone}<br>메모:${b.memo}</div>`).join('') || "예약 내역이 없습니다.";
-  }
-
-  function delBooking(id) {
-    bookings = bookings.filter(b => b.id !== id);
-    localStorage.setItem('bookings', JSON.stringify(bookings));
-    renderBookings();
-  }
-
-  function renderAdminFacilities() {
-    document.getElementById('admin-facility-list').innerHTML = facilities.map(f => 
-      `<div>${f.name} (${f.fee}) <button onclick="delFacility(${f.id})" style="background:#cc0000; width:auto; padding:5px;">삭제</button></div>`).join('');
-  }
-
-  function addFacility() {
-    facilities.push({id: Date.now(), name: document.getElementById('new-name').value, fee: document.getElementById('new-fee').value});
-    localStorage.setItem('facilities', JSON.stringify(facilities));
-    renderAdminFacilities();
-  }
-
-  function delFacility(id) {
-    facilities = facilities.filter(f => f.id !== id);
-    localStorage.setItem('facilities', JSON.stringify(facilities));
-    renderAdminFacilities();
-  }
-
   function downloadExcel() {
-    let csv = "날짜,장소,소속,성명,연락처,메모\n" + bookings.map(b => `${b.date},${b.fac},${b.group},${b.name},${b.phone},${b.memo}`).join("\n");
-    const blob = new Blob(["\ufeff"+csv], {type: 'text/csv;charset=utf-8;'});
+    let csv = "날짜,장소,성명\n" + bookings.map(b => `${b.date},${b.fac},${b.name}`).join("\n");
     const link = document.createElement("a");
-    link.href = URL.createObjectURL(blob);
+    link.href = "data:text/csv;charset=utf-8,\ufeff" + encodeURI(csv);
     link.download = "예약현황.csv";
     link.click();
   }
-
-  // 시설 초기 렌더링
-  document.getElementById('facility-list').innerHTML = facilities.map(f => 
-    `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} (${f.fee})</div>`).join('');
 </script>
 </body>
 </html>
