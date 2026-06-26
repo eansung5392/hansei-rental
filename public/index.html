@@ -7,24 +7,24 @@
   <style>
     :root { --primary-color: #002F6C; --secondary-color: #8A7355; --bg-light: #F4F6F9; }
     body { background-color: var(--bg-light); padding-bottom: 60px; font-family: 'Malgun Gothic', sans-serif; }
-    
+    header { background: #FFF; padding: 20px; text-align: center; border-bottom: 3px solid var(--secondary-color); }
+    header h1 { color: var(--primary-color); font-size: 24px; font-weight: bold; }
     .nav-tabs { display: flex; justify-content: center; background-color: var(--primary-color); }
     .tab-btn { flex: 1; padding: 15px; background: none; border: none; color: #FFF; font-weight: bold; cursor: pointer; }
     .tab-btn.active { background-color: var(--secondary-color); }
-    
     .container { max-width: 1100px; margin: 20px auto; padding: 20px; background: #FFF; border-radius: 8px; }
     .page { display: none; }
     .page.active { display: block; }
-    
+    .notice-box { background: #FFFDE7; border: 1px solid #FFE082; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
     .card { border: 1px solid #DDD; padding: 20px; margin-bottom: 10px; cursor: pointer; border-radius: 8px; transition: 0.2s; }
-    .card:hover { border-color: var(--primary-color); }
     .card.selected { border: 2px solid var(--primary-color); background: #F0F5FA; }
-    
-    .form-group { margin-top: 20px; }
-    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #DDD; }
+    .form-group { margin-top: 15px; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #DDD; border-radius: 4px; }
   </style>
 </head>
 <body>
+
+  <header><h1>HANSEI UNIVERSITY 대관시스템</h1></header>
 
   <nav class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('rent')">대관 신청하기</button>
@@ -34,22 +34,36 @@
 
   <div class="container">
     <div id="page-rent" class="page active">
-      <div style="font-weight:bold; margin-bottom:15px;">1. 대관 날짜 선택</div>
+      <div class="notice-box">
+        <strong>공지사항</strong>
+        <p>• 모든 대관은 사용일 최소 3일 전에 신청 완료되어야 승인이 가능합니다.</p>
+      </div>
+      <div style="font-weight:bold; margin-bottom:10px;">1. 대관 날짜 선택</div>
       <input type="date" id="input-date" onchange="resetSelection()" style="width:100%; padding:10px;">
       
-      <div style="font-weight:bold; margin-top:30px; margin-bottom:15px;">2. 시설 선택</div>
+      <div style="font-weight:bold; margin-top:30px; margin-bottom:10px;">2. 시설 선택</div>
       <div id="facility-cards"></div>
       
       <div id="booking-form" style="display:none; margin-top:30px; border-top:2px solid var(--primary-color); padding-top:20px;">
-        <div style="font-weight:bold;">3. 상세 신청 정보</div>
-        <div class="form-group"><label>단체/학과명</label><input type="text" id="group-name" placeholder="단체명을 입력하세요"></div>
-        <div class="form-group"><label>사용 목적</label><textarea id="purpose" rows="3" placeholder="사용 목적을 상세히 적어주세요"></textarea></div>
+        <div style="font-weight:bold; font-size:18px;">3. 상세 신청 정보</div>
+        <div class="form-group"><label>단체/학과명</label><input type="text" id="group-name"></div>
+        <div class="form-group"><label>성함</label><input type="text" id="user-name"></div>
+        <div class="form-group"><label>연락처</label><input type="text" id="phone"></div>
+        <div class="form-group"><label>사용 목적</label><textarea id="purpose" rows="3"></textarea></div>
         <button onclick="submitBooking()" style="margin-top:20px; padding:15px; width:100%; background:var(--primary-color); color:#FFF; border:none; cursor:pointer; font-weight:bold;">최종 대관 신청하기</button>
       </div>
     </div>
 
-    <div id="page-status" class="page">예약 현황조회 페이지입니다.</div>
-    <div id="page-admin" class="page">관리자 페이지입니다.</div>
+    <div id="page-status" class="page">
+      <div style="font-weight:bold; margin-bottom:10px;">예약 현황</div>
+      <p>현재 접수된 예약이 없습니다.</p>
+    </div>
+
+    <div id="page-admin" class="page">
+      <div style="font-weight:bold; margin-bottom:10px;">관리자 인증</div>
+      <input type="password" id="admin-pw" placeholder="비밀번호를 입력하세요" style="width:200px;">
+      <button onclick="checkAdmin()" style="padding:10px; background:var(--primary-color); color:#FFF; border:none;">로그인</button>
+    </div>
   </div>
 
   <script>
@@ -78,13 +92,17 @@
     function selectFacility(element, name) {
       document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
       element.classList.add('selected');
-      // 상세 폼 표시 로직
       document.getElementById('booking-form').style.display = 'block';
     }
 
     function resetSelection() {
       document.getElementById('booking-form').style.display = 'none';
       renderFacilities();
+    }
+
+    function checkAdmin() {
+      if(document.getElementById('admin-pw').value === '1234') alert('관리자 모드 접속');
+      else alert('비밀번호가 틀렸습니다.');
     }
 
     function submitBooking() {
