@@ -19,7 +19,8 @@
     .card { padding: 15px; border: 1px solid #ccc; margin: 5px 0; cursor: pointer; border-radius: 5px; }
     .card.selected { border: 2px solid var(--primary-color); background: #eef; }
     input, textarea { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-    button { cursor: pointer; padding: 10px 15px; border: none; background: var(--primary-color); color: white; border-radius: 4px; }
+    button { cursor: pointer; padding: 8px 12px; border: none; background: var(--primary-color); color: white; border-radius: 4px; }
+    .del-btn { background: #cc0000; margin-left: 10px; font-size: 12px; }
   </style>
 </head>
 <body>
@@ -58,14 +59,14 @@
     </div>
     <div id="admin-box" style="display:none;">
       <h3>관리자 대시보드</h3>
-      <div style="margin-bottom:20px;">
+      <div>
         <h4>공지사항 수정</h4>
-        <textarea id="new-notice-text" placeholder="새 공지사항을 입력하세요"></textarea>
+        <textarea id="new-notice-text"></textarea>
         <button onclick="updateNotice()">공지사항 적용</button>
       </div>
       <hr>
       <h3>예약 현황</h3>
-      <div id="booking-list" style="border:1px solid #ddd; padding:10px; margin-bottom:20px; border-radius:4px;"></div>
+      <div id="booking-list"></div>
       <hr>
       <h3>시설 및 금액 관리</h3>
       <div id="admin-facility-list"></div>
@@ -98,9 +99,7 @@
   }
 
   function renderUI() {
-    const list = document.getElementById('facility-list');
-    list.innerHTML = facilities.map(f => `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} (${f.fee})</div>`).join('');
-    
+    document.getElementById('facility-list').innerHTML = facilities.map(f => `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} (${f.fee})</div>`).join('');
     document.getElementById('admin-facility-list').innerHTML = facilities.map(f => `
       <div style="margin:5px 0;">${f.name} - ${f.fee} <button onclick="delFacility(${f.id})" style="background:#cc0000;">삭제</button></div>
     `).join('');
@@ -114,17 +113,15 @@
 
   function submitRent() {
     if(!selectedFac) { alert("장소를 선택해주세요!"); return; }
-    
-    const newBooking = {
+    bookings.push({
+      id: Date.now(),
       date: document.getElementById('rent-date').value,
       fac: selectedFac,
       group: document.getElementById('group').value,
       name: document.getElementById('name').value,
       phone: document.getElementById('phone').value,
       memo: document.getElementById('memo').value
-    };
-
-    bookings.push(newBooking);
+    });
     localStorage.setItem('myBookings', JSON.stringify(bookings));
     alert('신청이 완료되었습니다!');
   }
@@ -133,15 +130,24 @@
     if(document.getElementById('pw').value === '1234') {
       document.getElementById('admin-box').style.display = 'block';
       document.getElementById('login-box').style.display = 'none';
-      
-      document.getElementById('booking-list').innerHTML = bookings.map(b => `
-        <div style="border-bottom:1px solid #ccc; padding:10px; margin-bottom:5px;">
-          <b>[${b.date}] ${b.fac}</b><br>
-          소속: ${b.group} | 성명: ${b.name} | 연락처: ${b.phone}<br>
-          메모: ${b.memo}
-        </div>
-      `).join('') || "현재 접수된 예약이 없습니다.";
+      renderBookings();
     } else alert('비밀번호 오류');
+  }
+
+  function renderBookings() {
+    document.getElementById('booking-list').innerHTML = bookings.map(b => `
+      <div style="border-bottom:1px solid #ccc; padding:10px; margin-bottom:5px;">
+        <b>[${b.date}] ${b.fac}</b> <button class="del-btn" onclick="delBooking(${b.id})">삭제</button><br>
+        소속: ${b.group} | 성명: ${b.name} | 연락처: ${b.phone}<br>
+        메모: ${b.memo}
+      </div>
+    `).join('') || "현재 접수된 예약이 없습니다.";
+  }
+
+  function delBooking(id) {
+    bookings = bookings.filter(b => b.id !== id);
+    localStorage.setItem('myBookings', JSON.stringify(bookings));
+    renderBookings();
   }
 
   function addFacility() {
@@ -156,7 +162,6 @@
     renderUI();
   }
 
-  // 초기화 및 로드
   document.getElementById('notice-content').innerText = localStorage.getItem('notice') || "• 모든 대관은 사용일 최소 3일 전에 신청 완료되어야 승인이 가능합니다.";
   renderUI();
 </script>
