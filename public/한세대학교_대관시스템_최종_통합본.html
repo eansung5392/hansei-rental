@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>한세대학교 대관시스템 (헤더 텍스트 반영본)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+KR:wght=500;700&family=Roboto+Mono:wght=500;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#14213D;
+    --ink-soft:#2A3F66;
+    --ink-muted:#5B6472;
+    --paper:#F6F4EC;
+    --paper-raised:#FFFFFF;
+    --gold:#C9952C;
+    --gold-deep:#9C6F18;
+    --line:#DCD6C6;
+    --success:#2F6F4F;
+    --danger:#B3432B;
+    --radius:4px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Pretendard','-apple-system','Apple SD Gothic Neo','Malgun Gothic',sans-serif;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1050px;margin:0 auto;padding:0 24px 20px;}
+  
+  /* ---------- 상단 헤더 영역 (텍스트 스타일 최적화) ---------- */
+  header.site{
+    border-bottom: 3px solid var(--ink);
+    padding: 28px 0 20px;
+    margin-bottom: 0;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .brand-en {
+    font-family: 'Noto Serif KR', Georgia, serif;
+    font-weight: 700;
+    font-size: 26px;
+    letter-spacing: 0.5px;
+    color: var(--gold);
+    text-transform: uppercase;
+  }
+  h1.site-title{
+    font-family:'Noto Serif KR',Georgia,serif;
+    font-weight:700;
+    font-size:26px;
+    margin:0;
+    letter-spacing:0.5px;
+    color: var(--ink);
+  }
+
+  /* ---------- 상단 내비게이션 탭 ---------- */
+  .nav-tabs {
+    display: flex;
+    width: 100%;
+    margin-top: 20px;
+    border-bottom: 2px solid var(--ink);
+    background: var(--paper-raised);
+  }
+  .nav-tab {
+    flex: 1;
+    text-align: center;
+    padding: 14px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 15px;
+    color: var(--ink-muted);
+    border: 1px solid var(--line);
+    border-bottom: none;
+    user-select: none;
+    transition: all 0.15s ease;
+  }
+  .nav-tab:hover {
+    background: #fdfdfa;
+    color: var(--ink);
+  }
+  .nav-tab.active {
+    background: var(--ink);
+    color: #FFFFFF;
+    border-color: var(--ink);
+  }
+
+  .page-content { display: none; margin-top: 25px; min-height: 500px; }
+  .page-content.active { display: block; }
+
+  /* ---------- 공지사항 (NOTICE) ---------- */
+  .notice{
+    margin-top:22px;
+    background:var(--ink);
+    color:#EFE9D8;
+    border-radius:var(--radius);
+    padding:20px 24px 22px;
+  }
+  .notice-label{
+    font-size:11px;
+    letter-spacing:2px;
+    color:var(--gold);
+    font-weight:700;
+    margin:0 0 10px;
+  }
+  .notice ul{margin:0;padding:0;list-style:none;}
+  .notice li{
+    padding:7px 0;
+    border-top:1px solid rgba(239,233,216,0.14);
+    font-size:13.5px;
+    display:flex;
+    gap:10px;
+  }
+  .notice li:first-child{border-top:none;}
+  .notice li .n{color:var(--gold);font-family:'Roboto Mono',monospace;font-size:12px;flex-shrink:0;padding-top:1px;}
+  .notice li .star{color:#ffdd67; font-weight:bold;}
+
+  /* ---------- Step sections ---------- */
+  .step{margin-top:40px;}
+  .step-head{
+    display:flex;align-items:baseline;gap:12px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:10px;
+    margin-bottom:20px;
+  }
+  .step-num{
+    font-family:'Roboto Mono',monospace;
+    font-weight:700;font-size:13px;
+    color:var(--gold-deep);
+    letter-spacing:1px;
+  }
+  .step-title{
+    font-family:'Noto Serif KR',Georgia,serif;
+    font-size:19px;font-weight:700;margin:0;
+  }
+
+  /* 카테고리 필터 버튼 */
+  .cat-filter-wrap {
+    margin-bottom: 15px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .btn-filter {
+    padding: 8px 16px;
+    font-size: 13.5px;
+    font-weight: bold;
+    border: 1px solid var(--line);
+    background: var(--paper-raised);
+    color: var(--ink-soft);
+    cursor: pointer;
+    border-radius: var(--radius);
+    transition: all 0.15s;
+  }
+  .btn-filter.active {
+    background: var(--gold);
+    color: white;
+    border-color: var(--gold);
+  }
+
+  /* 시설 카드 리스트 구조 */
+  .grid-cat{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin: 0;
+    width: 100%;
+  }
+  .cat-cell {
+    flex: 1;
+    min-width: 220px;
+  }
+  .cat-card{
+    width: 100%;
+    background:var(--paper-raised);
+    border:1.5px solid var(--line);
+    border-radius:var(--radius);
+    padding:18px 14px;
+    text-align:left;
+    cursor:pointer;
+    transition:all .15s;
+    font-family:inherit;
+    user-select: none;
+    display: block;
+  }
+  .cat-card:hover{border-color:var(--gold);}
+  .cat-card.active{border-color:var(--ink);background:var(--ink);color:#fff;}
+  .cat-card .ico{font-family:'Roboto Mono',monospace;font-size:11px;color:var(--gold);display:block;margin-bottom:8px;letter-spacing:1px;}
+  .cat-card .name{font-weight:700;font-size:14.5px;display:block;}
+  .cat-card .unit{font-size:11.5px;color:var(--ink-muted);display:block;margin-top:4px;}
+  .cat-card.active .unit{color:#CBD3E0;}
+
+  /* 시간 슬롯 그리드 구조 */
+  .slot-grid{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    margin-top: 5px;
+  }
+  .slot-row { display: flex; gap: 8px; width: 100%; flex-wrap: wrap; }
+  .slot{
+    flex: 1;
+    min-width: 180px;
+    border:1.5px solid var(--line);border-radius:var(--radius);padding:12px;
+    font-size:12.5px;cursor:pointer;background:var(--paper-raised);text-align:left;font-family:inherit;
+    transition: all 0.15s ease;
+    user-select: none;
+  }
+  .slot b{display:block;font-size:13.5px;margin-bottom:2px;}
+  .slot:hover { border-color: var(--gold); }
+  .slot.active{border-color:var(--gold);background:#FBF1DC; color:var(--ink);}
+  .slot.disabled{background:#E9E5DA; color:var(--ink-muted); border-color:var(--line); cursor:not-allowed;}
+
+  /* 입력 폼 */
+  .form-container { display: flex; flex-direction: column; gap: 14px; margin-top: 20px; }
+  .form-row { display: flex; gap: 14px; width: 100%; flex-wrap: wrap; }
+  .form-group { flex: 1; display: flex; flex-direction: column; min-width: 200px; }
+  .form-group.full { width: 100%; }
+  .field label{display:block;font-size:12px;color:var(--ink-muted);margin-bottom:6px;letter-spacing:.3px;}
+  .field input, .field textarea, .field select{
+    width:100%;border:1.5px solid var(--line);border-radius:var(--radius);padding:10px 11px;
+    font-size:14px;font-family:inherit;background:var(--paper-raised);color:var(--ink);
+  }
+  .field input:focus, .field textarea:focus, .field select:focus{outline:2px solid var(--gold);border-color:var(--gold);}
+
+  /* 대관료 안내 보드 */
+  .board{
+    margin-top:26px;
+    background:var(--ink);
+    border-radius:6px;
+    padding:26px;
+    color:#EFE9D8;
+  }
+  .board-label{font-size:11px;letter-spacing:2px;color:#9FB0CE;margin:0 0 6px;}
+  .board-total{
+    font-family:'Roboto Mono',monospace;
+    font-weight:700; font-size: 28px; color: var(--gold); margin-bottom: 15px;
+  }
+  .deposit-info {
+    border-top: 1px dashed rgba(239,233,216,0.3);
+    padding-top: 15px;
+    font-size: 13px;
+    color: #CBD3E0;
+    line-height: 1.6;
+  }
+  .deposit-info b { color: #fff; }
+  .deposit-info .highlight { color: var(--gold); font-weight: bold; }
+  
+  .btn-submit{
+    width:100%;background:var(--gold);color:var(--paper-raised);border:none;padding:16px;
+    font-size:16px;font-weight:700;border-radius:var(--radius);cursor:pointer;margin-top:20px;
+    font-family:'Noto Serif KR',serif;transition: background .2s;
+  }
+  .btn-submit:hover{background:var(--gold-deep);}
+
+  /* ---------- 관리자 패스워드 화면 ---------- */
+  .auth-container {
+    max-width: 400px; margin: 80px auto; background: var(--paper-raised);
+    border: 1.5px solid var(--line); padding: 30px; border-radius: var(--radius); text-align: center;
+  }
+  .auth-title { font-family: 'Noto Serif KR', serif; font-size: 20px; font-weight: bold; margin-bottom: 10px; }
+  .btn-auth {
+    background: var(--ink); color: white; border: none; padding: 10px 20px;
+    border-radius: var(--radius); cursor: pointer; font-weight: bold; margin-top: 10px; width: 100%;
+  }
+
+  /* ---------- 관리자 대시보드 ---------- */
+  .admin-menu-wrap {
+    display: flex; gap: 10px; border-bottom: 1px solid var(--line); margin-bottom: 20px; padding-bottom: 5px;
+    flex-wrap: wrap;
+  }
+  .admin-menu-btn {
+    padding: 6px 14px; background: transparent; border: none; color: var(--ink-muted); font-size: 13.5px; cursor: pointer; font-weight: bold;
+  }
+  .admin-menu-btn.active {
+    color: var(--ink); border-bottom: 2px solid var(--ink);
+  }
+  .admin-sub-section { display: none; }
+  .admin-sub-section.active { display: block; }
+
+  .control-box {
+    background: var(--paper-raised); border: 1.5px solid var(--line); padding: 22px; border-radius: var(--radius); margin-bottom: 20px;
+  }
+  .control-box h3 { margin: 0 0 15px 0; font-family: 'Noto Serif KR', serif; font-size: 16px; border-left: 3px solid var(--gold); padding-left: 8px; }
+
+  /* 테이블 공통 디자인 */
+  table.admin-table {
+    width: 100%; border-collapse: collapse; margin-top: 10px; background: var(--paper-raised); font-size: 13.5px;
+  }
+  table.admin-table th, table.admin-table td {
+    border: 1px solid var(--line); padding: 10px; text-align: center;
+  }
+  table.admin-table th { background: #ECE7DB; color: var(--ink); font-weight: bold; }
+
+  .badge { padding: 3px 8px; border-radius: 3px; font-size: 11px; font-weight: bold; display: inline-block; }
+  .badge.pending { background: #FFEAA7; color: #8A6D1C; }
+  .badge.approved { background: #D4EDDA; color: var(--success); }
+  .badge.rejected { background: #F8D7DA; color: var(--danger); }
+
+  .btn-action { padding: 4px 8px; font-size: 12px; border: 1px solid var(--line); border-radius: 3px; cursor: pointer; background: #fff; margin: 0 2px; }
+  .btn-action.approve { background: var(--success); color: white; border-color: var(--success); }
+  .btn-action.reject { background: var(--danger); color: white; border-color: var(--danger); }
+  
+  .btn-small { padding: 6px 12px; font-size: 12px; background: var(--ink); color: #fff; border: none; border-radius: var(--radius); cursor: pointer; }
+  .btn-small:hover { background: var(--gold-deep); }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header class="site">
+    <div class="brand-en">Hansei University</div>
+    <h1 class="site-title">시설 대관 시스템</h1>
+  </header>
+
+  <nav class="nav-tabs">
+    <div class="nav-tab active" onclick="switchTab('user')">대관 신청하기</div>
+    <div class="nav-tab" onclick="switchTab('admin')">관리자 대시보드</div>
+  </nav>
+
+  <div id="page-user" class="page-content active">
+    <section class="notice">
+      <div class="notice-label">NOTICE / 이용 수칙</div>
+      <ul id="main-notice-list">
+        </ul>
+    </section>
+
+    <section class="step">
+      <div class="step-head">
+        <span class="step-num">STEP 01</span>
+        <h2 class="step-title">대관 시설 선택</h2>
+      </div>
+      
+      <div class="cat-filter-wrap" id="main-filter-wrap">
+        </div>
+
+      <div class="grid-cat" id="facility-list-target">
+        </div>
+    </section>
+
+    <section class="step">
+      <div class="step-head">
+        <span class="step-num">STEP 02</span>
+        <h2 class="step-title">대관 일시 선택</h2>
+      </div>
+      
+      <div class="form-container" style="margin-top:0; margin-bottom:15px;">
+        <div class="form-group field" style="max-width: 300px;">
+          <label>대관 희망 날짜</label>
+          <input type="date" id="input-date" onchange="handleDateChange()">
+        </div>
+      </div>
+
+      <div class="slot-grid">
+        <div class="slot-row">
+          <button class="slot" id="slot-1" onclick="toggleTimeSlot(1)">
+            <b>오전 타임 (09:00 - 13:00)</b>
+            <span class="slot-status">날짜와 시설을 선택해주세요</span>
+          </button>
+          <button class="slot" id="slot-2" onclick="toggleTimeSlot(2)">
+            <b>오후 타임 (13:00 - 17:00)</b>
+            <span class="slot-status">날짜와 시설을 선택해주세요</span>
+          </button>
+          <button class="slot" id="slot-3" onclick="toggleTimeSlot(3)">
+            <b>야간 타임 (17:00 - 21:00)</b>
+            <span class="slot-status">날짜와 시설을 선택해주세요</span>
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <section class="step">
+      <div class="step-head">
+        <span class="step-num">STEP 03</span>
+        <h2 class="step-title">신청서 작성 및 정산 확인</h2>
+      </div>
+
+      <div class="form-container">
+        <div class="form-row">
+          <div class="form-group field">
+            <label>신청 단체/부서명</label>
+            <input type="text" id="form-group-name" placeholder="예: 컴퓨터공학과 학생회 / 외부 단체명">
+          </div>
+          <div class="form-group field">
+            <label>책임자 성명</label>
+            <input type="text" id="form-user-name" placeholder="실명 입력">
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group field">
+            <label>연락처</label>
+            <input type="tel" id="form-phone" placeholder="010-XXXX-XXXX">
+          </div>
+          <div class="form-group field">
+            <label>사용 목적 구분</label>
+            <select id="form-purpose-type" onchange="calculateFees()">
+              <option value="학생행사">교내 순수 학과/동아리 행사 (무료 혹은 면제)</option>
+              <option value="학교공식">교내 부서 주관 공식 행사 (면제)</option>
+              <option value="외부영리">외부 기관 대관 - 영리 목적 (기본 요금)</option>
+              <option value="외부비영리">외부 기관 대관 - 비영리/공익 목적 (20% 감면)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group field full">
+          <label>상세 행사 목적 및 시설 사용 계획</label>
+          <textarea id="form-desc" rows="4" placeholder="행사 내용 및 특이사항(장비 반입 여부 등)을 적어주세요."></textarea>
+        </div>
+      </div>
+
+      <div class="board">
+        <div class="board-label">TOTAL RENTAL FEE / 예상 대관 비용</div>
+        <div class="board-total" id="display-total-fee">0 원</div>
+        <div class="deposit-info">
+          * 지출 증빙 및 승인 안내: 교내 행사는 최종 승인 후 바로 이용 가능하며, 외부 단체는 <span class="highlight">우리은행 1004-123-456789 (예금주: 한세대학교)</span> 계좌로 대관료 전액이 입금 확인되어야 '대관 승인서'가 교부됩니다.
+        </div>
+      </div>
+
+      <button class="btn-submit" onclick="submitReservation()">대관 신청서 온라인 제출하기</button>
+    </section>
+  </div>
+
+  <div id="page-admin-auth" class="page-content">
+    <div class="auth-container">
+      <div class="auth-title">관리자 인증</div>
+      <p style="font-size:13px; color:var(--ink-muted); margin-bottom:20px;">시스템 관리자 계정의 비밀번호를 입력하십시오.</p>
+      <div class="field">
+        <input type="password" id="admin-pw-input" placeholder="비밀번호 입력 (초기값: 1234)">
+      </div>
+      <button class="btn-auth" onclick="verifyAdminPassword()">로그인</button>
+    </div>
+  </div>
+
+  <div id="page-admin-dashboard" class="page-content">
+    <div class="admin-menu-wrap">
+      <button class="admin-menu-btn active" onclick="switchAdminSub('list')">신청 내역 검토 및 승인</button>
+      <button class="admin-menu-btn" onclick="switchAdminSub('notice')">공지사항 관리</button>
+      <button class="admin-menu-btn" onclick="switchAdminSub('setting')">카테고리 및 시설 금액 설정</button>
+    </div>
+
+    <div id="admin-sub-list" class="admin-sub-section active">
+      <div class="control-box">
+        <h3>실시간 대관 접수 내역</h3>
+        <div style="overflow-x:auto;">
+          <table class="admin-table">
+            <thead>
+              <tr>
+                <th>번호</th>
+                <th>시설명</th>
+                <th>대관일 / 타임</th>
+                <th>신청 단체(담당자)</th>
+                <th>구분</th>
+                <th>정산금액</th>
+                <th>상태</th>
+                <th>관리 조치</th>
+              </tr>
+            </thead>
+            <tbody id="admin-table-body">
+              </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div id="admin-sub-notice" class="admin-sub-section">
+      <div class="control-box">
+        <h3>메인 공지사항 및 이용수칙 편집</h3>
+        <p style="font-size:13px; color:var(--ink-muted);">한 줄씩 노출될 핵심 공지사항 수칙들을 작성하고 편집할 수 있습니다.</p>
+        <div class="form-container" id="admin-notice-editor-list">
+          </div>
+        <div style="margin-top:15px; display:flex; gap:10px;">
+          <button class="btn-small" onclick="addNoticeRow()">+ 공지 항목 추가</button>
+          <button class="btn-small" style="background:var(--gold);" onclick="saveNotices()">공지사항 실시간 배포 저장</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="admin-sub-setting" class="admin-sub-section">
+      <div class="control-box">
+        <h3>새로운 대관 카테고리 추가</h3>
+        <div class="form-row" style="align-items: flex-end;">
+          <div class="form-group field">
+            <label>카테고리 명칭</label>
+            <input type="text" id="new-cat-name" placeholder="예: 스터디룸 / 실험실">
+          </div>
+          <button class="btn-small" style="height:42px; background:var(--success);" onclick="addNewCategory()">카테고리 추가등록</button>
+        </div>
+        <div style="margin-top:10px; font-size:13px;">
+          <b>현재 등록된 카테고리 리스트:</b> <span id="admin-cat-tags" style="color:var(--gold-deep)"></span>
+        </div>
+      </div>
+
+      <div class="control-box">
+        <h3>신규 대관 시설 추가</h3>
+        <div class="form-container">
+          <div class="form-row">
+            <div class="form-group field">
+              <label>시설 카테고리 선택</label>
+              <select id="new-facility-cat">
+                </select>
+            </div>
+            <div class="form-group field">
+              <label>시설명</label>
+              <input type="text" id="new-facility-name" placeholder="예: 비전센터 401호">
+            </div>
+          </div>
+          <div class="form-row" style="align-items: flex-end;">
+            <div class="form-group field">
+              <label>타임당 기본 대관 요금 (원)</label>
+              <input type="number" id="new-facility-fee" value="100000">
+            </div>
+            <button class="btn-small" style="height:42px; background:var(--ink-soft);" onclick="addNewFacility()">시설 추가 등록</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="control-box">
+        <h3>시설별 운영 정보 및 타임별 단가 원격 수정</h3>
+        <p style="font-size:13px; color:var(--ink-muted);">각 시설의 타임당(4시간 기준) 단가를 수정하고 원격으로 즉시 변경할 수 있습니다.</p>
+        <div id="admin-fee-setting-target">
+          </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  // ---------- 핵심 초기 데이터 데이터 구조 ----------
+  let categoriesData = ["강당/예술", "체육", "회의/세미나"];
+
+  let facilitiesData = [
+    { id: "F001", name: "본관 대강당", category: "강당/예술", baseFee: 300000, unitText: "타임당(4시간)" },
+    { id: "F002", name: "음악관 콘서트홀", category: "강당/예술", baseFee: 250000, unitText: "타임당(4시간)" },
+    { id: "F003", name: "영산비전센터 실내체육관", category: "체육", baseFee: 200000, unitText: "타임당(4시간)" },
+    { id: "F004", name: "대운동장 (인조잔디)", category: "체육", baseFee: 150000, unitText: "타임당(4시간)" },
+    { id: "F005", name: "학술정보관 국제세미나실", category: "회의/세미나", baseFee: 120000, unitText: "타임당(4시간)" },
+    { id: "F006", name: "IT관 대회의실", category: "회의/세미나", baseFee: 80000, unitText: "타임당(4시간)" }
+  ];
+
+  let noticesData = [
+    "모든 대관은 <span class='star'>사용일 최소 3일 전</span>에 신청 완료되어야 승인이 가능합니다.",
+    "예약 후 보증금 혹은 대관료가 명시된 <b>가상계좌</b>로 입금되어야 최종 승인 처리됩니다.",
+    "정규 수업 및 학교 공식 행사 일정이 우선되며, 관리자 판단에 의해 취소되거나 조정될 수 있습니다."
+  ];
+
+  // 가상 대관 신청 내역 데이터 저장소
+  let reservations = [
+    {
+      id: 1001,
+      facilityId: "F001",
+      facilityName: "본관 대강당",
+      date: "2026-07-10",
+      slots: [1, 2],
+      groupName: "응용소프트웨어학과",
+      userName: "김한세",
+      phone: "010-1234-5678",
+      purposeType: "학생행사",
+      desc: "정기 학술제 및 연극제 진행",
+      totalFee: 0,
+      status: "pending"
+    },
+    {
+      id: 1002,
+      facilityId: "F003",
+      facilityName: "영산비전센터 실내체육관",
+      date: "2026-07-12",
+      slots: [2],
+      groupName: "시민 농구동호회",
+      userName: "박철수",
+      phone: "010-9876-5432",
+      purposeType: "외부비영리",
+      desc: "주말 친목도모 농구 대회",
+      totalFee: 160000,
+      status: "approved"
+    }
+  ];
+
+  // 상태 관리 객체 변수
+  let selectedFacilityId = null;
+  let selectedSlots = [];
+  let currentFilter = "ALL";
+  let isAdminAuthenticated = false;
+
+  window.onload = function() {
+    // 날짜 제한 초기화 (최소 3일 후 제한)
+    const today = new Date();
+    today.setDate(today.getDate() + 3);
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    document.getElementById('input-date').min = `${yyyy}-${mm}-${dd}`;
+    
+    // 데이터 초기 연동 렌더링
+    renderNotices();
+    renderCategoryFilters();
+    renderFacilityCards();
+    updateTimeSlotUI();
+  };
+
+  // ---------- [원인 예방] 안전한 데이터 매칭 유틸 ----------
+  function findFacilityById(id) {
+    return facilitiesData.find(f => f.id === id) || null;
+  }
+
+  // ---------- 공지사항 동적 출력 및 렌더링 ----------
+  function renderNotices() {
+    const listTarget = document.getElementById('main-notice-list');
+    listTarget.innerHTML = '';
+    noticesData.forEach((notice, idx) => {
+      const numStr = String(idx + 1).padStart(2, '0');
+      const li = document.createElement('li');
+      li.innerHTML = `<span class="n">${numStr}</span> <span>${notice}</span>`;
+      listTarget.appendChild(li);
+    });
+  }
+
+  // ---------- 카테고리 필터 버튼 동적 출력 ----------
+  function renderCategoryFilters() {
+    const wrap = document.getElementById('main-filter-wrap');
+    wrap.innerHTML = '';
+
+    // 전체보기 버튼 기본 배치
+    const btnAll = document.createElement('button');
+    btnAll.className = `btn-filter ${currentFilter === 'ALL' ? 'active' : ''}`;
+    btnAll.innerText = '전체보기';
+    btnAll.onclick = function() { filterCategory('ALL'); };
+    wrap.appendChild(btnAll);
+
+    // 가변 등록 카테고리들 추가
+    categoriesData.forEach(cat => {
+      const btn = document.createElement('button');
+      btn.className = `btn-filter ${currentFilter === cat ? 'active' : ''}`;
+      btn.innerText = cat;
+
+      btn.onclick = function() { filterCategory(cat); };
+      wrap.appendChild(btn);
+    });
+  }
+
+  function filterCategory(cat) {
+    currentFilter = cat;
+    renderCategoryFilters();
+    renderFacilityCards();
+  }
+
+  // ---------- 사용자 영역: 시설 카드 목록화 ----------
+  function renderFacilityCards() {
+    const target = document.getElementById('facility-list-target');
+    target.innerHTML = '';
+
+    const filtered = facilitiesData.filter(f => currentFilter === 'ALL' || f.category === currentFilter);
+
+    if(filtered.length === 0) {
+      target.innerHTML = '<p style="padding:15px; color:var(--ink-muted); font-size:14px;">선택한 카테고리에 해당하는 등록 시설이 없습니다.</p>';
+      return;
+    }
+
+    filtered.forEach(f => {
+      const isSelected = f.id === selectedFacilityId;
+      const cell = document.createElement('div');
+      cell.className = 'cat-cell';
+      cell.innerHTML = `
+        <button type="button" class="cat-card ${isSelected ? 'active' : ''}" onclick="selectFacility('${f.id}')">
+          <span class="ico">[${f.category}]</span>
+          <span class="name">${f.name}</span>
+          <span class="unit">기본: ${f.baseFee.toLocaleString()}원 / ${f.unitText}</span>
+        </button>
+      `;
+      target.appendChild(cell);
+    });
+  }
+
+  function selectFacility(id) {
+    selectedFacilityId = id;
+    selectedSlots = []; 
+    renderFacilityCards();
+    updateTimeSlotUI();
+    calculateFees();
+  }
+
+  function handleDateChange() {
+    selectedSlots = [];
+    updateTimeSlotUI();
+    calculateFees();
+  }
+
+  // ★ [수정 핵심] 날짜 중복체크를 "동일한 시설"을 기준으로만 필터링하도록 변경
+  function getDisabledSlotsForCurrent() {
+    const dateVal = document.getElementById('input-date').value;
+    if (!dateVal || !selectedFacilityId) return [];
+
+    let disabled = [];
+    reservations.forEach(r => {
+      // 날짜와 상태(승인완료), 그리고 현재 사용자가 선택한 시설(facilityId)까지 모두 일치할 때만 마감 처리
+      if (r.facilityId === selectedFacilityId && r.date === dateVal && r.status === 'approved') {
+        disabled = disabled.concat(r.slots);
+      }
+    });
+    return disabled;
+  }
+
+  function updateTimeSlotUI() {
+    const dateVal = document.getElementById('input-date').value;
+    const disabledSlots = getDisabledSlotsForCurrent();
+
+    for (let i = 1; i <= 3; i++) {
+      const slotBtn = document.getElementById(`slot-${i}`);
+      const statusText = slotBtn.querySelector('.slot-status');
+
+      slotBtn.className = 'slot';
+      
+      if (!selectedFacilityId || !dateVal) {
+        statusText.innerText = '날짜와 시설을 우선 지정하십시오';
+        continue;
+      }
+
+      if (disabledSlots.includes(i)) {
+        slotBtn.classList.add('disabled');
+        statusText.innerText = '✕ 예약 마감 (승인 완료)';
+      } else if (selectedSlots.includes(i)) {
+        slotBtn.classList.add('active');
+        statusText.innerText = '✓ 선택됨';
+      } else {
+        statusText.innerText = '● 예약 가능';
+      }
+    }
+  }
+
+  function toggleTimeSlot(slotNum) {
+    const dateVal = document.getElementById('input-date').value;
+    if (!selectedFacilityId || !dateVal) {
+      alert('시설과 대관 날짜를 먼저 선택해 주세요.');
+      return;
+    }
+
+    const disabledSlots = getDisabledSlotsForCurrent();
+    if (disabledSlots.includes(slotNum)) {
+      alert('해당 시설은 이미 승인 완료된 타임입니다. 다른 시설이나 시간을 지정해주십시오.');
+      return;
+    }
+
+    const index = selectedSlots.indexOf(slotNum);
+    if (index > -1) {
+      selectedSlots.splice(index, 1);
+    } else {
+      selectedSlots.push(slotNum);
+    }
+
+    updateTimeSlotUI();
+    calculateFees();
+  }
+
+  // ★ [수정 핵심] 단가(baseFee)에 선택한 타임(시간 슬롯) 개수를 곱해 중복 카운팅 합산
+  function calculateFees() {
+    if (!selectedFacilityId || selectedSlots.length === 0) {
+      document.getElementById('display-total-fee').innerText = "0 원";
+      return 0;
+    }
+
+    const facility = findFacilityById(selectedFacilityId);
+    if (!facility) return 0;
+
+    // 타임 수만큼 단가가 중복 카운팅(누적 합산)됩니다.
+    let total = facility.baseFee * selectedSlots.length;
+    const purpose = document.getElementById('form-purpose-type').value;
+
+    if (purpose === '학생행사' || purpose === '학교공식') {
+      total = 0; 
+    } else if (purpose === '외부비영리') {
+      total = total * 0.8; 
+    }
+
+    document.getElementById('display-total-fee').innerText = total.toLocaleString() + " 원";
+    return total;
+  }
+
+  function submitReservation() {
+    const dateVal = document.getElementById('input-date').value;
+    const groupName = document.getElementById('form-group-name').value.trim();
+    const userName = document.getElementById('form-user-name').value.trim();
+    const phone = document.getElementById('form-phone').value.trim();
+    const purposeType = document.getElementById('form-purpose-type').value;
+    const desc = document.getElementById('form-desc').value.trim();
+
+    if (!selectedFacilityId) return alert('대관할 시설을 선택해 주세요.');
+    if (!dateVal) return alert('대관 날짜를 입력해 주세요.');
+    if (selectedSlots.length === 0) return alert('대관 시간을 최소 1개 이상 지정해 주세요.');
+    if (!groupName || !userName || !phone) return alert('단체명, 신청자 성명, 연락처는 필수 입력값입니다.');
+
+    const facility = findFacilityById(selectedFacilityId);
+    const finalFee = calculateFees();
+
+    const newRes = {
+      id: Date.now(),
+      facilityId: selectedFacilityId,
+      facilityName: facility.name,
+      date: dateVal,
+      slots: [...selectedSlots],
+      groupName: groupName,
+      userName: userName,
+      phone: phone,
+      purposeType: purposeType,
+      desc: desc,
+      totalFee: finalFee,
+      status: 'pending'
+    };
+
+    reservations.push(newRes);
+    alert('대관 신청서가 정상 접수되었습니다.\n관리자 승인 처리 후 대관 확정됩니다.');
+    
+    // 선택 필드 전체 초기화
+    selectedSlots = [];
+    document.getElementById('form-group-name').value = '';
+    document.getElementById('form-user-name').value = '';
+    document.getElementById('form-phone').value = '';
+    document.getElementById('form-desc').value = '';
+    updateTimeSlotUI();
+    calculateFees();
+  }
+
+  // ---------- 상단 메인 내비게이션 관리 ----------
+  function switchTab(tab) {
+    const tabs = document.querySelectorAll('.nav-tab');
+    tabs[0].classList.remove('active');
+    tabs[1].classList.remove('active');
+
+    document.getElementById('page-user').classList.remove('active');
+    document.getElementById('page-admin-auth').classList.remove('active');
+    document.getElementById('page-admin-dashboard').classList.remove('active');
+
+    if (tab === 'user') {
+      tabs[0].classList.add('active');
+      document.getElementById('page-user').classList.add('active');
+      renderNotices();
+      renderCategoryFilters();
+      renderFacilityCards();
+    } else {
+      tabs[1].classList.add('active');
+      if (isAdminAuthenticated) {
+        document.getElementById('page-admin-dashboard').classList.add('active');
+        renderAdminDashboard();
+      } else {
+        document.getElementById('page-admin-auth').classList.add('active');
+      }
+    }
+  }
+
+  // ---------- 관리자 로그인 체크 ----------
+  function verifyAdminPassword() {
+    const pw = document.getElementById('admin-pw-input').value;
+    if (pw === '1234') {
+      isAdminAuthenticated = true;
+      document.getElementById('page-admin-auth').classList.remove('active');
+      document.getElementById('page-admin-dashboard').classList.add('active');
+      renderAdminDashboard();
+    } else {
+      alert('비밀번호가 올바르지 않습니다.');
+    }
+  }
+
+  function switchAdminSub(sub) {
+    document.getElementById('admin-sub-list').classList.remove('active');
+    document.getElementById('admin-sub-notice').classList.remove('active');
+    document.getElementById('admin-sub-setting').classList.remove('active');
+    document.querySelectorAll('.admin-menu-btn').forEach(b => b.classList.remove('active'));
+
+    if (sub === 'list') {
+      document.getElementById('admin-sub-list').classList.add('active');
+      document.querySelectorAll('.admin-menu-btn')[0].classList.add('active');
+      renderAdminDashboard();
+    } else if (sub === 'notice') {
+      document.getElementById('admin-sub-notice').classList.add('active');
+      document.querySelectorAll('.admin-menu-btn')[1].classList.add('active');
+      renderAdminNoticeEditor();
+    } else {
+      document.getElementById('admin-sub-setting').classList.add('active');
+      document.querySelectorAll('.admin-menu-btn')[2].classList.add('active');
+      renderAdminSettings();
+    }
+  }
+
+  // ---------- [관리자] 대관 목록 승인/반려 ----------
+  function renderAdminDashboard() {
+    const tbody = document.getElementById('admin-table-body');
+    tbody.innerHTML = '';
+
+    if(reservations.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" style="color:var(--ink-muted); padding:20px;">접수 내역이 존재하지 않습니다.</td></tr>';
+      return;
+    }
+
+    reservations.forEach((r, idx) => {
+      const tr = document.createElement('tr');
+      
+      let statusBadge = '';
+      if(r.status === 'pending') statusBadge = '<span class="badge pending">승인대기</span>';
+      else if(r.status === 'approved') statusBadge = '<span class="badge approved">대관확정</span>';
+      else statusBadge = '<span class="badge rejected">반려처리</span>';
+
+      let slotNames = r.slots.map(s => s===1?'오전':s===2?'오후':'야간').join(', ');
+
+      tr.innerHTML = `
+        <td>${idx + 1}</td>
+        <td><b>${r.facilityName}</b></td>
+        <td>${r.date}<br><small style="color:var(--gold-deep)">${slotNames}</small></td>
+        <td>${r.groupName}<br><small>(${r.userName})</small></td>
+        <td>${r.purposeType}</td>
+        <td>${r.totalFee.toLocaleString()}원</td>
+        <td>${statusBadge}</td>
+        <td>
+          ${r.status === 'pending' ? `
+            <button class="btn-action approve" onclick="approveRes(${r.id})">승인</button>
+            <button class="btn-action reject" onclick="rejectRes(${r.id})">반려</button>
+          ` : `<span style="font-size:12px; color:var(--ink-muted);">조치완료</span>`}
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function approveRes(id) {
+    const res = reservations.find(r => r.id === id);
+    if(res) {
+      res.status = 'approved';
+      alert('해당 신청 대관을 승인 확정 처리했습니다.');
+      renderAdminDashboard();
+    }
+  }
+
+  function rejectRes(id) {
+    const res = reservations.find(r => r.id === id);
+    if(res) {
+      res.status = 'rejected';
+      alert('신청을 반려 처리했습니다.');
+      renderAdminDashboard();
+    }
+  }
+
+  // ---------- [관리자] 공지사항 편집 기능 ----------
+  function renderAdminNoticeEditor() {
+    const target = document.getElementById('admin-notice-editor-list');
+    target.innerHTML = '';
+
+    noticesData.forEach((notice, idx) => {
+      const div = document.createElement('div');
+      div.className = 'form-row';
+      div.style.alignItems = 'center';
+      div.innerHTML = `
+        <span style="font-weight:bold; width:30px;">${idx+1}</span>
+        <div class="field" style="flex:1;">
+          <input type="text" class="admin-notice-input" value="${notice.replace(/"/g, '&quot;')}">
+        </div>
+        <button class="btn-action reject" onclick="deleteNoticeRow(${idx})">삭제</button>
+      `;
+      target.appendChild(div);
+    });
+  }
+
+  function addNoticeRow() {
+    noticesData.push("새로운 공지사항 안내 내용을 작성해 주세요.");
+    renderAdminNoticeEditor();
+  }
+
+  function deleteNoticeRow(idx) {
+    noticesData.splice(idx, 1);
+    renderAdminNoticeEditor();
+  }
+
+  function saveNotices() {
+    const inputs = document.querySelectorAll('.admin-notice-input');
+    const newNotices = [];
+    inputs.forEach(input => {
+      if(input.value.trim() !== '') {
+        newNotices.push(input.value.trim());
+      }
+    });
+    noticesData = newNotices;
+    alert('공지사항이 정상적으로 수정 및 실시간 저장 배포되었습니다.');
+    renderAdminNoticeEditor();
+  }
+
+  // ---------- [관리자] 카테고리 추가 및 시설 원격 금액 설정 ----------
+  function renderAdminSettings() {
+    // 1. 카테고리 태그 모음 가이드 노출
+    document.getElementById('admin-cat-tags').innerText = categoriesData.join(', ');
+
+    // 2. 시설 추가 폼 내부 셀렉트박스 동기화
+    const catSelect = document.getElementById('new-facility-cat');
+    catSelect.innerHTML = '';
+    categoriesData.forEach(cat => {
+      const opt = document.createElement('option');
+      opt.value = cat;
+      opt.innerText = cat;
+      catSelect.appendChild(opt);
+    });
+
+    // 3. 시설 단가 제어 리스트 바인딩
+    const target = document.getElementById('admin-fee-setting-target');
+    target.innerHTML = '';
+
+    facilitiesData.forEach(f => {
+      const div = document.createElement('div');
+      div.className = 'form-row';
+      div.style.marginBottom = '12px';
+      div.style.alignItems = 'center';
+      div.innerHTML = `
+        <div style="flex:1; font-weight:bold; font-size:14px; color:var(--ink);">
+          ${f.name} <span style="font-size:11px; color:var(--gold-deep); font-weight:normal;">[${f.category}]</span>
+        </div>
+        <div class="field" style="width:180px;">
+          <input type="number" value="${f.baseFee}" onchange="updateFacilityFee('${f.id}', this.value)" style="padding:6px 10px;">
+        </div>
+        <div style="width:35px; margin-left:5px; font-size:13px; color:var(--ink-muted);">원</div>
+      `;
+      target.appendChild(div);
+    });
+  }
+
+  function addNewCategory() {
+    const catInput = document.getElementById('new-cat-name');
+    const name = catInput.value.trim();
+
+    if(!name) return alert('추가할 카테고리 이름을 입력하세요.');
+    if(categoriesData.includes(name)) return alert('이미 등록되어 있는 동일한 카테고리입니다.');
+
+    categoriesData.push(name);
+    alert(`[${name}] 카테고리가 새롭게 등록되었습니다.`);
+    catInput.value = '';
+    renderAdminSettings();
+  }
+
+  function addNewFacility() {
+    const cat = document.getElementById('new-facility-cat').value;
+    const name = document.getElementById('new-facility-name').value.trim();
+    const fee = parseInt(document.getElementById('new-facility-fee').value) || 0;
+
+    if(!name) return alert('시설 명칭을 입력해 주세요.');
+
+    const newId = "F" + String(facilitiesData.length + 1).padStart(3, '0');
+    const newFacility = {
+      id: newId,
+      name: name,
+      category: cat,
+      baseFee: fee,
+      unitText: "타임당(4시간)"
+    };
+
+    facilitiesData.push(newFacility);
+    alert(`[${name}] 시설이 대관 자산 목록에 정식 추가 등록되었습니다.`);
+    document.getElementById('new-facility-name').value = '';
+    renderAdminSettings();
+  }
+
+  function updateFacilityFee(id, newPrice) {
+    const facility = findFacilityById(id);
+    if(facility) {
+      facility.baseFee = parseInt(newPrice) || 0;
+    }
+  }
+</script>
+
+</body>
+</html>
