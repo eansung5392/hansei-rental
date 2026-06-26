@@ -2,10 +2,11 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>한세대학교 대관시스템</title>
   <style>
-    :root { --primary-color: #002F6C; --secondary-color: #8A7355; }
-    body { font-family: 'Malgun Gothic', sans-serif; margin: 0; padding: 0; background: #f4f6f9; }
+    :root { --primary-color: #002F6C; --secondary-color: #8A7355; --bg-light: #F4F6F9; }
+    body { font-family: 'Malgun Gothic', sans-serif; margin: 0; background: var(--bg-light); }
     header { background: #FFF; padding: 20px; text-align: center; border-bottom: 3px solid var(--secondary-color); }
     .nav-tabs { display: flex; justify-content: center; background-color: var(--primary-color); }
     .tab-btn { padding: 15px 30px; border: none; color: #FFF; font-weight: bold; cursor: pointer; background: none; }
@@ -14,9 +15,10 @@
     .page { display: none; }
     .page.active { display: block; }
     .step { margin-bottom: 25px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
-    .card { padding: 15px; border: 1px solid #ccc; margin: 5px 0; cursor: pointer; }
+    .card { padding: 15px; border: 1px solid #ccc; margin: 5px 0; cursor: pointer; border-radius: 5px; }
     .card.selected { border: 2px solid var(--primary-color); background: #eef; }
-    input, textarea { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+    button { cursor: pointer; padding: 10px 15px; border: none; background: var(--primary-color); color: white; border-radius: 4px; }
   </style>
 </head>
 <body>
@@ -42,7 +44,7 @@
       <input type="text" id="phone" placeholder="연락처">
       <textarea id="memo" placeholder="메모/요청사항"></textarea>
     </div>
-    <button onclick="submitRent()" style="width:100%; padding:15px; background:var(--primary-color); color:white; border:none; cursor:pointer;">신청 완료</button>
+    <button onclick="submitRent()" style="width:100%; padding:15px; font-weight:bold;">신청 완료</button>
   </div>
 
   <div id="page-admin" class="page">
@@ -51,7 +53,8 @@
     </div>
     <div id="admin-box" style="display:none;">
       <h3>예약 현황</h3>
-      <div id="booking-list" style="border:1px solid #ddd; padding:10px; margin-bottom:20px;"></div>
+      <div id="booking-list" style="border:1px solid #ddd; padding:10px; margin-bottom:20px; border-radius:4px;"></div>
+      <hr>
       <h3>시설 및 금액 관리</h3>
       <div id="admin-facility-list"></div>
       <div style="margin-top:20px;">
@@ -76,13 +79,11 @@
   }
 
   function renderUI() {
-    // 신청 페이지 장소 렌더링
     const list = document.getElementById('facility-list');
     list.innerHTML = facilities.map(f => `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} (${f.fee})</div>`).join('');
     
-    // 관리자 페이지 시설 렌더링
     document.getElementById('admin-facility-list').innerHTML = facilities.map(f => `
-      <div style="margin:5px 0;">${f.name} - ${f.fee} <button onclick="delFacility(${f.id})">삭제</button></div>
+      <div style="margin:5px 0;">${f.name} - ${f.fee} <button onclick="delFacility(${f.id})" style="background:#cc0000;">삭제</button></div>
     `).join('');
   }
 
@@ -93,8 +94,13 @@
   }
 
   function submitRent() {
-    bookings.push({date: document.getElementById('rent-date').value, fac: selectedFac, name: document.getElementById('name').value});
-    alert('신청되었습니다!');
+    if(!selectedFac) { alert("장소를 선택해주세요!"); return; }
+    bookings.push({
+      date: document.getElementById('rent-date').value,
+      fac: selectedFac,
+      name: document.getElementById('name').value
+    });
+    alert('신청이 완료되었습니다!');
   }
 
   function checkAdmin() {
