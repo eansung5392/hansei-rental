@@ -5,27 +5,24 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>한세대학교 대관시스템</title>
   <style>
-    /* CSS 스타일을 HTML 안에 직접 포함 */
     :root { --primary-color: #002F6C; --secondary-color: #8A7355; --bg-light: #F4F6F9; }
-    body { background-color: var(--bg-light); padding-bottom: 60px; font-family: 'Malgun Gothic', sans-serif; margin: 0; }
+    body { background-color: var(--bg-light); font-family: 'Malgun Gothic', sans-serif; margin: 0; }
     header { background: #FFF; padding: 20px; text-align: center; border-bottom: 3px solid var(--secondary-color); }
-    header h1 { color: var(--primary-color); font-size: 24px; font-weight: bold; margin: 0; }
     .nav-tabs { display: flex; justify-content: center; background-color: var(--primary-color); }
-    .tab-btn { flex: 1; padding: 15px; background: none; border: none; color: #FFF; font-weight: bold; cursor: pointer; }
+    .tab-btn { flex: 1; padding: 15px; border: none; color: #FFF; font-weight: bold; cursor: pointer; background: none; }
     .tab-btn.active { background-color: var(--secondary-color); }
-    .container { max-width: 1100px; margin: 20px auto; padding: 20px; background: #FFF; border-radius: 8px; }
+    .container { max-width: 800px; margin: 20px auto; padding: 20px; background: #FFF; border-radius: 8px; }
     .page { display: none; }
     .page.active { display: block; }
-    .notice-box { background: #FFFDE7; border: 1px solid #FFE082; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
-    .card { border: 1px solid #DDD; padding: 20px; margin-bottom: 10px; cursor: pointer; border-radius: 8px; }
-    .admin-panel { border-top: 2px solid #ccc; margin-top: 20px; padding-top: 20px; }
-    .edit-row { display: flex; gap: 10px; margin-bottom: 10px; }
+    .step { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
+    .card { padding: 15px; border: 1px solid #ccc; margin: 5px 0; cursor: pointer; }
+    .card.selected { border: 2px solid var(--primary-color); background: #eef; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
   </style>
 </head>
 <body>
 
   <header><h1>HANSEI UNIVERSITY 대관시스템</h1></header>
-
   <nav class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('rent')">대관 신청하기</button>
     <button class="tab-btn" onclick="switchTab('admin')">관리자 대시보드</button>
@@ -33,87 +30,81 @@
 
   <div class="container">
     <div id="page-rent" class="page active">
-      <div class="notice-box">
-        <strong>공지사항</strong>
-        <p id="notice-text">• 모든 대관은 사용일 최소 3일 전에 신청 완료되어야 승인이 가능합니다.</p>
+      <h3>대관 신청하기</h3>
+      <div class="step">
+        <label><b>1. 대관 일자 선택</b></label>
+        <input type="date" id="rent-date">
       </div>
-      <div id="facility-cards"></div>
+      <div class="step">
+        <label><b>2. 대관 장소 선택</b></label>
+        <div id="facility-list"></div>
+      </div>
+      <div class="step">
+        <label><b>3. 신청 정보 입력</b></label>
+        <input type="text" id="group" placeholder="소속/단체명">
+        <input type="text" id="name" placeholder="성명">
+        <input type="text" id="phone" placeholder="연락처">
+        <textarea id="memo" placeholder="메모/요청사항"></textarea>
+      </div>
+      <button onclick="submitRent()" style="width:100%; padding:15px; background:var(--primary-color); color:white; border:none;">신청 완료</button>
     </div>
 
     <div id="page-admin" class="page">
-      <div id="admin-login-area">
-        <input type="password" id="admin-pw" placeholder="비밀번호">
-        <button onclick="checkAdmin()">로그인</button>
-      </div>
-      <div id="admin-dashboard" class="admin-panel" style="display:none;">
-        <h3>관리자 설정</h3>
-        <div>
-          <h4>1. 공지사항 수정</h4>
-          <input type="text" id="new-notice" style="width:100%;">
-          <button onclick="updateNotice()">공지사항 적용</button>
-        </div>
-        <div>
-          <h4>2. 시설 및 금액 관리</h4>
-          <div id="admin-facility-list"></div>
-        </div>
+      <div id="login-box"><input type="password" id="pw" placeholder="비밀번호"><button onclick="checkAdmin()">로그인</button></div>
+      <div id="admin-box" style="display:none;">
+        <h3>시설 관리</h3>
+        <div id="admin-facility-list"></div>
+        <hr>
+        <h4>새 시설 추가</h4>
+        <input type="text" id="new-name" placeholder="시설명">
+        <input type="text" id="new-fee" placeholder="이용료">
+        <button onclick="addFacility()">추가하기</button>
       </div>
     </div>
   </div>
 
   <script>
-    let facilities = [
-      { id: 1, name: '본관 대강당', fee: '300,000원' },
-      { id: 2, name: '실내체육관', fee: '200,000원' },
-      { id: 3, name: '국제세미나실', fee: '120,000원' }
-    ];
+    let facilities = [{id:1, name:'본관 대강당', fee:'300,000원'}, {id:2, name:'실내체육관', fee:'200,000원'}];
 
-    function switchTab(tabId) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    function switchTab(id) {
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      document.getElementById('page-'+id).classList.add('active');
       event.target.classList.add('active');
-      document.getElementById('page-' + tabId).classList.add('active');
     }
 
-    function renderFacilities() {
-      const cardDiv = document.getElementById('facility-cards');
-      cardDiv.innerHTML = facilities.map(f => `
-        <div class="card"><strong>${f.name}</strong><br><span>이용료: ${f.fee}</span></div>
-      `).join('');
+    // 시설 렌더링
+    function renderList() {
+      const list = document.getElementById('facility-list');
+      list.innerHTML = facilities.map(f => `<div class="card" onclick="this.classList.add('selected')">${f.name} (${f.fee})</div>`).join('');
+      
+      const adminList = document.getElementById('admin-facility-list');
+      adminList.innerHTML = facilities.map(f => `<div>${f.name} - ${f.fee} <button onclick="delFacility(${f.id})">삭제</button></div>`).join('');
+    }
+
+    function addFacility() {
+      const name = document.getElementById('new-name').value;
+      const fee = document.getElementById('new-fee').value;
+      facilities.push({id: Date.now(), name, fee});
+      renderList();
+    }
+
+    function delFacility(id) {
+      facilities = facilities.filter(f => f.id !== id);
+      renderList();
     }
 
     function checkAdmin() {
-      if(document.getElementById('admin-pw').value === '1234') {
-        document.getElementById('admin-login-area').style.display = 'none';
-        document.getElementById('admin-dashboard').style.display = 'block';
-        renderAdminList();
-      } else { alert('비밀번호가 틀렸습니다.'); }
+      if(document.getElementById('pw').value === '1234') {
+        document.getElementById('admin-box').style.display = 'block';
+        document.getElementById('login-box').style.display = 'none';
+        renderList();
+      } else alert('비번 오류');
     }
 
-    function updateNotice() {
-      document.getElementById('notice-text').innerText = document.getElementById('new-notice').value;
-      alert('공지사항이 업데이트되었습니다.');
-    }
+    function submitRent() { alert('신청되었습니다!'); }
 
-    function renderAdminList() {
-      const list = document.getElementById('admin-facility-list');
-      list.innerHTML = facilities.map(f => `
-        <div class="edit-row">
-          <input type="text" id="name-${f.id}" value="${f.name}">
-          <input type="text" id="fee-${f.id}" value="${f.fee}">
-          <button onclick="saveFacility(${f.id})">수정</button>
-        </div>
-      `).join('');
-    }
-
-    function saveFacility(id) {
-      const f = facilities.find(x => x.id === id);
-      f.name = document.getElementById('name-'+id).value;
-      f.fee = document.getElementById('fee-'+id).value;
-      renderFacilities();
-      alert('수정 완료!');
-    }
-
-    window.onload = renderFacilities;
+    renderList();
   </script>
 </body>
 </html>
