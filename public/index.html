@@ -1,110 +1,61 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>한세대학교 대관시스템</title>
-  <style>
-    :root { --primary-color: #002F6C; --secondary-color: #8A7355; --bg-light: #F4F6F9; }
-    body { background-color: var(--bg-light); font-family: 'Malgun Gothic', sans-serif; margin: 0; }
-    header { background: #FFF; padding: 20px; text-align: center; border-bottom: 3px solid var(--secondary-color); }
-    .nav-tabs { display: flex; justify-content: center; background-color: var(--primary-color); }
-    .tab-btn { flex: 1; padding: 15px; border: none; color: #FFF; font-weight: bold; cursor: pointer; background: none; }
-    .tab-btn.active { background-color: var(--secondary-color); }
-    .container { max-width: 800px; margin: 20px auto; padding: 20px; background: #FFF; border-radius: 8px; }
-    .page { display: none; }
-    .page.active { display: block; }
-    .step { margin-bottom: 30px; padding: 20px; border: 1px solid #ddd; border-radius: 8px; }
-    .card { padding: 15px; border: 1px solid #ccc; margin: 5px 0; cursor: pointer; }
-    .card.selected { border: 2px solid var(--primary-color); background: #eef; }
-    input, textarea { width: 100%; padding: 10px; margin-top: 5px; box-sizing: border-box; }
-  </style>
-</head>
-<body>
-
-  <header><h1>HANSEI UNIVERSITY 대관시스템</h1></header>
-  <nav class="nav-tabs">
-    <button class="tab-btn active" onclick="switchTab('rent')">대관 신청하기</button>
-    <button class="tab-btn" onclick="switchTab('admin')">관리자 대시보드</button>
-  </nav>
-
-  <div class="container">
-    <div id="page-rent" class="page active">
-      <h3>대관 신청하기</h3>
-      <div class="step">
-        <label><b>1. 대관 일자 선택</b></label>
-        <input type="date" id="rent-date">
-      </div>
-      <div class="step">
-        <label><b>2. 대관 장소 선택</b></label>
-        <div id="facility-list"></div>
-      </div>
-      <div class="step">
-        <label><b>3. 신청 정보 입력</b></label>
-        <input type="text" id="group" placeholder="소속/단체명">
-        <input type="text" id="name" placeholder="성명">
-        <input type="text" id="phone" placeholder="연락처">
-        <textarea id="memo" placeholder="메모/요청사항"></textarea>
-      </div>
-      <button onclick="submitRent()" style="width:100%; padding:15px; background:var(--primary-color); color:white; border:none;">신청 완료</button>
-    </div>
-
-    <div id="page-admin" class="page">
-      <div id="login-box"><input type="password" id="pw" placeholder="비밀번호"><button onclick="checkAdmin()">로그인</button></div>
-      <div id="admin-box" style="display:none;">
-        <h3>시설 관리</h3>
-        <div id="admin-facility-list"></div>
-        <hr>
-        <h4>새 시설 추가</h4>
-        <input type="text" id="new-name" placeholder="시설명">
-        <input type="text" id="new-fee" placeholder="이용료">
-        <button onclick="addFacility()">추가하기</button>
-      </div>
-    </div>
+<div id="page-admin" class="page">
+  <div id="login-box">
+    <input type="password" id="pw" placeholder="비밀번호">
+    <button onclick="checkAdmin()">로그인</button>
   </div>
+  
+  <div id="admin-box" style="display:none;">
+    <h3>관리자 대시보드</h3>
+    
+    <h4>예약 현황 리스트</h4>
+    <div id="admin-booking-list" style="border:1px solid #ccc; padding:10px; margin-bottom:20px;">
+      <p>조회된 예약이 없습니다.</p>
+    </div>
 
-  <script>
-    let facilities = [{id:1, name:'본관 대강당', fee:'300,000원'}, {id:2, name:'실내체육관', fee:'200,000원'}];
+    <hr>
+    
+    <h4>시설 및 금액 관리</h4>
+    <div id="admin-facility-list"></div>
+    </div>
+</div>
 
-    function switchTab(id) {
-      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.getElementById('page-'+id).classList.add('active');
-      event.target.classList.add('active');
+<script>
+  // 신청된 데이터를 저장할 배열 (실제 서버가 없으므로 로컬 메모리 활용)
+  let bookings = []; 
+
+  // 대관 신청 시 데이터 저장
+  function submitRent() {
+    const data = {
+      date: document.getElementById('rent-date').value,
+      group: document.getElementById('group').value,
+      name: document.getElementById('name').value,
+      phone: document.getElementById('phone').value
+    };
+    bookings.push(data); // 배열에 추가
+    alert('신청이 완료되었습니다!');
+  }
+
+  // 관리자 모드에서 예약 리스트 렌더링
+  function renderBookings() {
+    const list = document.getElementById('admin-booking-list');
+    if(bookings.length === 0) {
+      list.innerHTML = "<p>현재 접수된 예약이 없습니다.</p>";
+    } else {
+      list.innerHTML = bookings.map(b => `
+        <div style="border-bottom:1px solid #eee; padding:5px;">
+          [${b.date}] ${b.group} - ${b.name} (${b.phone})
+        </div>
+      `).join('');
     }
+  }
 
-    // 시설 렌더링
-    function renderList() {
-      const list = document.getElementById('facility-list');
-      list.innerHTML = facilities.map(f => `<div class="card" onclick="this.classList.add('selected')">${f.name} (${f.fee})</div>`).join('');
-      
-      const adminList = document.getElementById('admin-facility-list');
-      adminList.innerHTML = facilities.map(f => `<div>${f.name} - ${f.fee} <button onclick="delFacility(${f.id})">삭제</button></div>`).join('');
-    }
-
-    function addFacility() {
-      const name = document.getElementById('new-name').value;
-      const fee = document.getElementById('new-fee').value;
-      facilities.push({id: Date.now(), name, fee});
+  // checkAdmin 함수 내부에 추가
+  function checkAdmin() {
+    if(document.getElementById('pw').value === '1234') {
+      document.getElementById('admin-box').style.display = 'block';
+      document.getElementById('login-box').style.display = 'none';
       renderList();
-    }
-
-    function delFacility(id) {
-      facilities = facilities.filter(f => f.id !== id);
-      renderList();
-    }
-
-    function checkAdmin() {
-      if(document.getElementById('pw').value === '1234') {
-        document.getElementById('admin-box').style.display = 'block';
-        document.getElementById('login-box').style.display = 'none';
-        renderList();
-      } else alert('비번 오류');
-    }
-
-    function submitRent() { alert('신청되었습니다!'); }
-
-    renderList();
-  </script>
-</body>
-</html>
+      renderBookings(); // 관리자 로그인 시 예약 내역도 로드
+    } else alert('비밀번호가 틀렸습니다.');
+  }
+</script>
