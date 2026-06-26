@@ -6,34 +6,24 @@
   <style>
     :root { --primary-color: #002F6C; --secondary-color: #8A7355; --bg-light: #F4F6F9; }
     body { font-family: 'Malgun Gothic', sans-serif; margin: 0; background: var(--bg-light); padding-bottom: 50px; }
-    
     header { background: #FFF; padding: 25px; text-align: center; border-bottom: 3px solid var(--secondary-color); }
     h1 { color: var(--primary-color); margin: 0; }
-
     .nav-tabs { display: flex; justify-content: center; background-color: var(--primary-color); }
     .tab-btn { padding: 15px 30px; border: none; color: #FFF; font-weight: bold; cursor: pointer; background: none; }
     .tab-btn.active { background-color: var(--secondary-color); }
-
     .container { max-width: 700px; margin: 30px auto; padding: 30px; background: #FFF; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .page { display: none; }
-    .page.active { display: block; }
-
-    /* Step 스타일 */
+    .page { display: none; } .page.active { display: block; }
     .step-box { margin-bottom: 30px; padding: 20px; border: 1px solid #e1e4e8; border-radius: 8px; background: #fafafa; }
     .step-title { display: block; font-size: 1.1em; color: var(--primary-color); margin-bottom: 15px; font-weight: bold; border-left: 4px solid var(--primary-color); padding-left: 10px; }
-    
-    .card { padding: 15px; border: 1px solid #ccc; margin: 8px 0; cursor: pointer; border-radius: 6px; transition: 0.3s; }
-    .card:hover { background: #f0f0f0; }
+    .card { padding: 15px; border: 1px solid #ccc; margin: 8px 0; cursor: pointer; border-radius: 6px; }
     .card.selected { border: 2px solid var(--primary-color); background: #eef; }
-
     input, textarea { width: 100%; padding: 12px; margin-top: 8px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
-    button { cursor: pointer; padding: 15px; border: none; background: var(--primary-color); color: white; border-radius: 6px; font-weight: bold; width: 100%; margin-top: 10px; }
+    button { cursor: pointer; padding: 12px; border: none; background: var(--primary-color); color: white; border-radius: 6px; font-weight: bold; width: 100%; margin-top: 10px; }
   </style>
 </head>
 <body>
 
 <header><h1>HANSEI UNIVERSITY 대관시스템</h1></header>
-
 <nav class="nav-tabs">
   <button class="tab-btn active" onclick="switchTab('rent')">대관 신청하기</button>
   <button class="tab-btn" onclick="switchTab('admin')">관리자 대시보드</button>
@@ -41,17 +31,14 @@
 
 <div class="container">
   <div id="page-rent" class="page active">
-    
     <div class="step-box">
       <span class="step-title">1. 대관 일자 선택</span>
       <input type="date" id="rent-date">
     </div>
-
     <div class="step-box">
       <span class="step-title">2. 대관 장소 선택</span>
       <div id="facility-list"></div>
     </div>
-
     <div class="step-box">
       <span class="step-title">3. 신청 정보 입력</span>
       <input type="text" id="group" placeholder="소속/단체명">
@@ -59,33 +46,80 @@
       <input type="text" id="phone" placeholder="연락처">
       <textarea id="memo" placeholder="메모/요청사항" rows="3"></textarea>
     </div>
-
     <button onclick="submitRent()">신청 완료</button>
   </div>
 
   <div id="page-admin" class="page">
+    <div id="login-box">
+      <input type="password" id="admin-pw" placeholder="비밀번호"><button onclick="checkAdmin()">로그인</button>
     </div>
+    <div id="admin-box" style="display:none;">
+      <h3>예약 현황 <button onclick="downloadExcel()" style="background:#28a745; width:auto;">엑셀 다운로드</button></h3>
+      <div id="booking-list"></div>
+    </div>
+  </div>
 </div>
 
 <script>
-  // 시설 목록
   let facilities = [{id:1, name:'본관 대강당', fee:'300,000원'}, {id:2, name:'실내체육관', fee:'200,000원'}];
-  
-  // 시설 목록 렌더링
-  const list = document.getElementById('facility-list');
-  list.innerHTML = facilities.map(f => `<div class="card" onclick="selectFac(this)">${f.name} (${f.fee})</div>`).join('');
-
-  function selectFac(el) {
-    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-    el.classList.add('selected');
-  }
+  let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
+  let selectedFac = "";
 
   function switchTab(id) {
     document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('page-'+id).classList.add('active');
+    event.target.classList.add('active');
   }
 
-  function submitRent() { alert('신청되었습니다!'); }
+  function selectFac(el, name) {
+    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+    el.classList.add('selected');
+    selectedFac = name;
+  }
+
+  function renderFacilities() {
+    document.getElementById('facility-list').innerHTML = facilities.map(f => 
+      `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} (${f.fee})</div>`).join('');
+  }
+
+  function submitRent() {
+    if(!selectedFac) return alert("장소를 선택해주세요.");
+    bookings.push({
+      date: document.getElementById('rent-date').value,
+      fac: selectedFac,
+      group: document.getElementById('group').value,
+      name: document.getElementById('name').value,
+      phone: document.getElementById('phone').value,
+      memo: document.getElementById('memo').value
+    });
+    localStorage.setItem('bookings', JSON.stringify(bookings));
+    alert('신청이 완료되었습니다!');
+  }
+
+  function checkAdmin() {
+    if(document.getElementById('admin-pw').value === '1234') {
+      document.getElementById('admin-box').style.display = 'block';
+      document.getElementById('login-box').style.display = 'none';
+      renderBookings();
+    } else alert('비밀번호 오류');
+  }
+
+  function renderBookings() {
+    document.getElementById('booking-list').innerHTML = bookings.map(b => 
+      `<div style="border-bottom:1px solid #ccc; padding:10px;"><b>[${b.date}] ${b.fac}</b><br>소속:${b.group} / 성명:${b.name} / 연락처:${b.phone}</div>`).join('');
+  }
+
+  function downloadExcel() {
+    let csv = "날짜,장소,소속,성명,연락처,메모\n" + bookings.map(b => `${b.date},${b.fac},${b.group},${b.name},${b.phone},${b.memo}`).join("\n");
+    const blob = new Blob(["\ufeff"+csv], {type: 'text/csv;charset=utf-8;'});
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = "예약현황.csv";
+    link.click();
+  }
+
+  renderFacilities();
 </script>
 </body>
 </html>
