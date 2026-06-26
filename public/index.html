@@ -13,8 +13,12 @@
     .container { max-width: 1100px; margin: 20px auto; padding: 20px; background: #FFF; border-radius: 8px; }
     .page { display: none; }
     .page.active { display: block; }
-    .card { border: 1px solid #DDD; padding: 20px; margin-bottom: 10px; cursor: pointer; border-radius: 8px; }
+    .card { border: 1px solid #DDD; padding: 20px; margin-bottom: 10px; cursor: pointer; border-radius: 8px; transition: 0.2s; }
     .card:hover { border-color: var(--primary-color); }
+    .card.selected { border: 2px solid var(--primary-color); background: #F0F5FA; }
+    /* 상세 폼 스타일 추가 */
+    .form-group { margin-top: 20px; }
+    input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #DDD; }
   </style>
 </head>
 <body>
@@ -27,11 +31,19 @@
   <div class="container">
     <div id="page-rent" class="page active">
       <div style="font-weight:bold; margin-bottom:15px;">1. 대관 날짜 선택</div>
-      <input type="date" id="input-date" onchange="renderFacilities()" style="width:100%; padding:10px;">
+      <input type="date" id="input-date" onchange="resetSelection()" style="width:100%; padding:10px;">
+      
       <div style="font-weight:bold; margin-top:30px; margin-bottom:15px;">2. 시설 선택</div>
       <div id="facility-cards"></div>
+      
+      <div id="booking-form" style="display:none; margin-top:30px; border-top:2px solid var(--primary-color); padding-top:20px;">
+        <div style="font-weight:bold;">3. 상세 신청 정보</div>
+        <div class="form-group"><label>단체/학과명</label><input type="text" id="group-name" placeholder="단체명을 입력하세요"></div>
+        <div class="form-group"><label>사용 목적</label><textarea id="purpose" rows="3" placeholder="사용 목적을 상세히 적어주세요"></textarea></div>
+        <button onclick="submitBooking()" style="margin-top:20px; padding:15px; width:100%; background:var(--primary-color); color:#FFF; border:none; cursor:pointer; font-weight:bold;">최종 대관 신청하기</button>
+      </div>
     </div>
-    <div id="page-status" class="page">준비 중입니다.</div>
+    <div id="page-status" class="page">예약 현황조회 페이지입니다.</div>
     <div id="page-admin" class="page">관리자 페이지입니다.</div>
   </div>
 
@@ -52,10 +64,27 @@
     function renderFacilities() {
       const cardDiv = document.getElementById('facility-cards');
       cardDiv.innerHTML = facilities.map(f => `
-        <div class="card" onclick="alert('${f.name} 선택됨')">
+        <div class="card" onclick="selectFacility(this, '${f.name}')">
           <strong>${f.name}</strong><br><span>이용료: ${f.fee}</span>
         </div>
       `).join('');
+    }
+
+    function selectFacility(element, name) {
+      document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+      element.classList.add('selected');
+      // 상세 폼 표시
+      document.getElementById('booking-form').style.display = 'block';
+    }
+
+    function resetSelection() {
+      document.getElementById('booking-form').style.display = 'none';
+      renderFacilities();
+    }
+
+    function submitBooking() {
+      alert("신청이 완료되었습니다!");
+      location.reload();
     }
 
     window.onload = function() {
