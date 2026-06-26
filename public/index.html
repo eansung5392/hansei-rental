@@ -9,7 +9,6 @@
     header { text-align: center; margin-bottom: 20px; }
     .container { max-width: 700px; margin: auto; background: #FFF; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     .page { display: none; } .page.active { display: block; }
-    .notice-box { background: #FFFDE7; border: 1px solid #FFE082; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
     .step-box { margin-bottom: 25px; padding: 20px; border: 1px solid #e1e4e8; border-radius: 8px; background: #fafafa; }
     .step-title { display: block; font-size: 1.1em; color: var(--primary-color); margin-bottom: 15px; font-weight: bold; border-left: 4px solid var(--primary-color); padding-left: 10px; }
     .card { padding: 15px; border: 1px solid #ccc; margin: 8px 0; cursor: pointer; border-radius: 6px; }
@@ -20,9 +19,7 @@
 </head>
 <body>
 
-<header>
-  <h1 style="color: var(--primary-color);">한세대학교 대관시스템</h1>
-</header>
+<header><h1 style="color: var(--primary-color);">한세대학교 대관시스템</h1></header>
 
 <nav style="text-align:center; margin-bottom:20px;">
   <button onclick="switchTab('rent')" style="width:auto; padding: 10px 20px;">대관 신청하기</button>
@@ -32,13 +29,12 @@
 <div class="container">
   <div id="page-rent" class="page active">
     <h3>대관 신청</h3>
-    <div class="notice-box" id="display-notice"></div>
     <div class="step-box">
-      <span class="step-title">1. 일자 선택</span>
+      <span class="step-title">1. 일자</span>
       <input type="date" id="rent-date">
     </div>
     <div class="step-box">
-      <span class="step-title">2. 장소 선택</span>
+      <span class="step-title">2. 장소 (금액 확인)</span>
       <div id="facility-list"></div>
     </div>
     <div class="step-box">
@@ -52,45 +48,24 @@
   </div>
 
   <div id="page-admin" class="page">
-    <div id="login-box">
-      <input type="password" id="admin-pw" placeholder="비밀번호">
-      <button onclick="checkAdmin()">로그인</button>
-    </div>
-    <div id="admin-box" style="display:none;">
-      <h3>공지사항 수정</h3>
-      <textarea id="edit-notice"></textarea>
-      <button onclick="saveNotice()" style="background:#555;">공지사항 저장</button>
-      
-      <h3>시설 카테고리 관리</h3>
-      <div id="admin-facility-list"></div>
-      <input type="text" id="new-fac" placeholder="새 시설명">
-      <button onclick="addFacility()" style="background:#28a745;">추가</button>
-      
-      <h3>예약 현황</h3>
-      <div id="booking-list"></div>
-      <button onclick="downloadExcel()" style="background:#28a745;">엑셀 다운로드</button>
-    </div>
+    <h3>예약 관리</h3>
+    <div id="booking-list"></div>
+    <button onclick="downloadExcel()" style="background:#28a745; margin-top:20px;">엑셀 다운로드</button>
   </div>
 </div>
 
 <script>
-  let facilities = JSON.parse(localStorage.getItem('facilities')) || [{id:1, name:'본관 대강당'}, {id:2, name:'실내체육관'}];
+  // 금액 정보(fee)를 포함한 시설 목록
+  let facilities = JSON.parse(localStorage.getItem('facilities')) || [
+    {id:1, name:'본관 대강당', fee:'300,000원'}, 
+    {id:2, name:'실내체육관', fee:'200,000원'}
+  ];
   let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
-  let notice = localStorage.getItem('notice') || "공지사항입니다.";
-
-  // 초기 렌더링
-  document.getElementById('display-notice').innerText = notice;
-  document.getElementById('edit-notice').value = notice;
-  renderUI();
-
-  function switchTab(id) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('page-'+id).classList.add('active');
-  }
 
   function renderUI() {
-    document.getElementById('facility-list').innerHTML = facilities.map(f => `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name}</div>`).join('');
-    document.getElementById('admin-facility-list').innerHTML = facilities.map(f => `<div>${f.name} <button onclick="delFacility(${f.id})" style="background:#cc0000; width:auto; padding:5px;">삭제</button></div>`).join('');
+    // 장소 선택 시 금액 표시
+    document.getElementById('facility-list').innerHTML = facilities.map(f => 
+      `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} - <strong>${f.fee}</strong></div>`).join('');
   }
 
   function selectFac(el, name) {
@@ -99,46 +74,32 @@
     window.selectedFac = name;
   }
 
-  function saveNotice() {
-    let val = document.getElementById('edit-notice').value;
-    localStorage.setItem('notice', val);
-    document.getElementById('display-notice').innerText = val;
-    alert('저장 완료');
-  }
-
-  function addFacility() {
-    facilities.push({id: Date.now(), name: document.getElementById('new-fac').value});
-    localStorage.setItem('facilities', JSON.stringify(facilities));
-    renderUI();
-  }
-
-  function delFacility(id) {
-    facilities = facilities.filter(f => f.id !== id);
-    localStorage.setItem('facilities', JSON.stringify(facilities));
-    renderUI();
-  }
-
-  function checkAdmin() {
-    if(document.getElementById('admin-pw').value === '1234') {
-      document.getElementById('admin-box').style.display = 'block';
-      document.getElementById('login-box').style.display = 'none';
-      document.getElementById('booking-list').innerHTML = bookings.map(b => `<div>${b.date} / ${b.fac} / ${b.name}</div>`).join('');
-    } else alert('비밀번호 오류');
-  }
-
   function submitRent() {
-    bookings.push({ date: document.getElementById('rent-date').value, fac: window.selectedFac, name: document.getElementById('name').value });
+    bookings.push({ 
+      date: document.getElementById('rent-date').value, 
+      fac: window.selectedFac, 
+      name: document.getElementById('name').value,
+      phone: document.getElementById('phone').value // 연락처 저장
+    });
     localStorage.setItem('bookings', JSON.stringify(bookings));
     alert('신청 완료!');
   }
 
-  function downloadExcel() {
-    let csv = "날짜,장소,성명\n" + bookings.map(b => `${b.date},${b.fac},${b.name}`).join("\n");
-    const link = document.createElement("a");
-    link.href = "data:text/csv;charset=utf-8,\ufeff" + encodeURI(csv);
-    link.download = "예약현황.csv";
-    link.click();
+  function renderBookings() {
+    // 예약 현황에 연락처(phone) 표시
+    document.getElementById('booking-list').innerHTML = bookings.map(b => 
+      `<div style="padding:10px; border-bottom:1px solid #ccc;">
+        [${b.date}] ${b.fac} / 성명: ${b.name} / <strong>연락처: ${b.phone}</strong>
+      </div>`).join('');
   }
+
+  function switchTab(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-'+id).classList.add('active');
+    if(id === 'admin') renderBookings();
+  }
+
+  renderUI();
 </script>
 </body>
 </html>
