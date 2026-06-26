@@ -14,6 +14,7 @@
     .container { max-width: 800px; margin: 20px auto; padding: 20px; background: #FFF; border-radius: 8px; }
     .page { display: none; }
     .page.active { display: block; }
+    .notice-box { background: #FFFDE7; border: 1px solid #FFE082; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
     .step { margin-bottom: 25px; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
     .card { padding: 15px; border: 1px solid #ccc; margin: 5px 0; cursor: pointer; border-radius: 5px; }
     .card.selected { border: 2px solid var(--primary-color); background: #eef; }
@@ -31,6 +32,11 @@
 
 <div class="container">
   <div id="page-rent" class="page active">
+    <div class="notice-box">
+      <strong>공지사항</strong>
+      <p id="notice-content">• 모든 대관은 사용일 최소 3일 전에 신청 완료되어야 승인이 가능합니다.</p>
+    </div>
+    
     <div class="step">
       <b>1. 대관 일자 선택</b><br><input type="date" id="rent-date">
     </div>
@@ -52,6 +58,13 @@
       <input type="password" id="pw" placeholder="비밀번호"><button onclick="checkAdmin()">로그인</button>
     </div>
     <div id="admin-box" style="display:none;">
+      <h3>관리자 설정</h3>
+      <div style="margin-bottom:20px;">
+        <h4>공지사항 수정</h4>
+        <textarea id="new-notice-text" placeholder="새 공지사항을 입력하세요"></textarea>
+        <button onclick="updateNotice()">공지사항 적용</button>
+      </div>
+      <hr>
       <h3>예약 현황</h3>
       <div id="booking-list" style="border:1px solid #ddd; padding:10px; margin-bottom:20px; border-radius:4px;"></div>
       <hr>
@@ -76,6 +89,11 @@
     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
     document.getElementById('page-'+id).classList.add('active');
     event.target.classList.add('active');
+  }
+
+  function updateNotice() {
+    document.getElementById('notice-content').innerText = document.getElementById('new-notice-text').value;
+    alert('공지사항이 변경되었습니다.');
   }
 
   function renderUI() {
