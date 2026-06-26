@@ -7,6 +7,7 @@
     :root { --primary-color: #002F6C; --secondary-color: #8A7355; --bg-light: #F4F6F9; }
     body { font-family: 'Malgun Gothic', sans-serif; margin: 0; background: var(--bg-light); padding-bottom: 50px; }
     header { background: #FFF; padding: 25px; text-align: center; border-bottom: 3px solid var(--secondary-color); }
+    h1 { color: var(--primary-color); margin: 0; }
     .nav-tabs { display: flex; justify-content: center; background-color: var(--primary-color); }
     .tab-btn { padding: 15px 30px; border: none; color: #FFF; font-weight: bold; cursor: pointer; background: none; }
     .tab-btn.active { background-color: var(--secondary-color); }
@@ -55,14 +56,28 @@
       <button onclick="checkAdmin()">로그인</button>
     </div>
     <div id="admin-box" style="display:none;">
+      <h3>공지사항 관리</h3>
+      <textarea id="new-notice-text" placeholder="공지사항 내용을 입력하세요"></textarea>
+      <button onclick="updateNotice()">공지사항 적용</button>
+      
+      <hr style="margin:20px 0;">
+      
       <h3>예약 현황 <button onclick="downloadExcel()" style="background:#28a745; width:auto;">엑셀 다운로드</button></h3>
       <div id="booking-list"></div>
+      
+      <hr style="margin:20px 0;">
+      
+      <h3>시설 관리</h3>
+      <div id="admin-facility-list"></div>
+      <input type="text" id="new-name" placeholder="시설명">
+      <input type="text" id="new-fee" placeholder="이용료">
+      <button onclick="addFacility()">시설 추가</button>
     </div>
   </div>
 </div>
 
 <script>
-  let facilities = [{id:1, name:'본관 대강당', fee:'300,000원'}, {id:2, name:'실내체육관', fee:'200,000원'}];
+  let facilities = JSON.parse(localStorage.getItem('facilities')) || [{id:1, name:'본관 대강당', fee:'300,000원'}];
   let bookings = JSON.parse(localStorage.getItem('bookings')) || [];
   let selectedFac = "";
 
@@ -79,9 +94,15 @@
     selectedFac = name;
   }
 
+  function updateNotice() {
+    localStorage.setItem('notice', document.getElementById('new-notice-text').value);
+    alert('공지사항이 저장되었습니다.');
+  }
+
   function submitRent() {
     if(!selectedFac) return alert("장소를 선택해주세요.");
     bookings.push({
+      id: Date.now(),
       date: document.getElementById('rent-date').value,
       fac: selectedFac,
       group: document.getElementById('group').value,
@@ -98,12 +119,36 @@
       document.getElementById('admin-box').style.display = 'block';
       document.getElementById('login-box').style.display = 'none';
       renderBookings();
+      renderAdminFacilities();
     } else alert('비밀번호 오류');
   }
 
   function renderBookings() {
     document.getElementById('booking-list').innerHTML = bookings.map(b => 
-      `<div style="border-bottom:1px solid #ccc; padding:10px;"><b>[${b.date}] ${b.fac}</b><br>소속:${b.group} / 성명:${b.name} / 연락처:${b.phone}</div>`).join('');
+      `<div style="border-bottom:1px solid #ccc; padding:10px;"><b>[${b.date}] ${b.fac}</b> <button onclick="delBooking(${b.id})" style="background:#cc0000; width:auto; padding:5px;">삭제</button><br>소속:${b.group} / 성명:${b.name} / 연락처:${b.phone}<br>메모:${b.memo}</div>`).join('') || "예약 내역이 없습니다.";
+  }
+
+  function delBooking(id) {
+    bookings = bookings.filter(b => b.id !== id);
+    localStorage.setItem('bookings', JSON.stringify(bookings));
+    renderBookings();
+  }
+
+  function renderAdminFacilities() {
+    document.getElementById('admin-facility-list').innerHTML = facilities.map(f => 
+      `<div>${f.name} (${f.fee}) <button onclick="delFacility(${f.id})" style="background:#cc0000; width:auto; padding:5px;">삭제</button></div>`).join('');
+  }
+
+  function addFacility() {
+    facilities.push({id: Date.now(), name: document.getElementById('new-name').value, fee: document.getElementById('new-fee').value});
+    localStorage.setItem('facilities', JSON.stringify(facilities));
+    renderAdminFacilities();
+  }
+
+  function delFacility(id) {
+    facilities = facilities.filter(f => f.id !== id);
+    localStorage.setItem('facilities', JSON.stringify(facilities));
+    renderAdminFacilities();
   }
 
   function downloadExcel() {
@@ -115,7 +160,7 @@
     link.click();
   }
 
-  // 시설 리스트 렌더링
+  // 시설 초기 렌더링
   document.getElementById('facility-list').innerHTML = facilities.map(f => 
     `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} (${f.fee})</div>`).join('');
 </script>
