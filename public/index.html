@@ -7,21 +7,25 @@
   <style>
     :root { --primary-color: #002F6C; --secondary-color: #8A7355; --bg-light: #F4F6F9; }
     body { background-color: var(--bg-light); padding-bottom: 60px; font-family: 'Malgun Gothic', sans-serif; }
+    
     .nav-tabs { display: flex; justify-content: center; background-color: var(--primary-color); }
     .tab-btn { flex: 1; padding: 15px; background: none; border: none; color: #FFF; font-weight: bold; cursor: pointer; }
     .tab-btn.active { background-color: var(--secondary-color); }
+    
     .container { max-width: 1100px; margin: 20px auto; padding: 20px; background: #FFF; border-radius: 8px; }
     .page { display: none; }
     .page.active { display: block; }
+    
     .card { border: 1px solid #DDD; padding: 20px; margin-bottom: 10px; cursor: pointer; border-radius: 8px; transition: 0.2s; }
     .card:hover { border-color: var(--primary-color); }
     .card.selected { border: 2px solid var(--primary-color); background: #F0F5FA; }
-    /* 상세 폼 스타일 추가 */
+    
     .form-group { margin-top: 20px; }
     input, textarea { width: 100%; padding: 10px; margin-top: 5px; border: 1px solid #DDD; }
   </style>
 </head>
 <body>
+
   <nav class="nav-tabs">
     <button class="tab-btn active" onclick="switchTab('rent')">대관 신청하기</button>
     <button class="tab-btn" onclick="switchTab('status')">예약 현황조회</button>
@@ -43,6 +47,7 @@
         <button onclick="submitBooking()" style="margin-top:20px; padding:15px; width:100%; background:var(--primary-color); color:#FFF; border:none; cursor:pointer; font-weight:bold;">최종 대관 신청하기</button>
       </div>
     </div>
+
     <div id="page-status" class="page">예약 현황조회 페이지입니다.</div>
     <div id="page-admin" class="page">관리자 페이지입니다.</div>
   </div>
@@ -73,7 +78,7 @@
     function selectFacility(element, name) {
       document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
       element.classList.add('selected');
-      // 상세 폼 표시
+      // 상세 폼 표시 로직
       document.getElementById('booking-form').style.display = 'block';
     }
 
