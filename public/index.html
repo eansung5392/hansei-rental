@@ -7,7 +7,6 @@
     :root { --primary-color: #002F6C; --secondary-color: #8A7355; --bg-light: #F4F6F9; }
     body { font-family: 'Malgun Gothic', sans-serif; margin: 0; background: var(--bg-light); padding-bottom: 50px; }
     header { background: #FFF; padding: 25px; text-align: center; border-bottom: 3px solid var(--secondary-color); }
-    h1 { color: var(--primary-color); margin: 0; }
     .nav-tabs { display: flex; justify-content: center; background-color: var(--primary-color); }
     .tab-btn { padding: 15px 30px; border: none; color: #FFF; font-weight: bold; cursor: pointer; background: none; }
     .tab-btn.active { background-color: var(--secondary-color); }
@@ -50,8 +49,10 @@
   </div>
 
   <div id="page-admin" class="page">
-    <div id="login-box">
-      <input type="password" id="admin-pw" placeholder="비밀번호"><button onclick="checkAdmin()">로그인</button>
+    <div id="login-box" class="step-box">
+      <span class="step-title">관리자 로그인</span>
+      <input type="password" id="admin-pw" placeholder="비밀번호">
+      <button onclick="checkAdmin()">로그인</button>
     </div>
     <div id="admin-box" style="display:none;">
       <h3>예약 현황 <button onclick="downloadExcel()" style="background:#28a745; width:auto;">엑셀 다운로드</button></h3>
@@ -76,11 +77,6 @@
     document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
     el.classList.add('selected');
     selectedFac = name;
-  }
-
-  function renderFacilities() {
-    document.getElementById('facility-list').innerHTML = facilities.map(f => 
-      `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} (${f.fee})</div>`).join('');
   }
 
   function submitRent() {
@@ -119,7 +115,9 @@
     link.click();
   }
 
-  renderFacilities();
+  // 시설 리스트 렌더링
+  document.getElementById('facility-list').innerHTML = facilities.map(f => 
+    `<div class="card" onclick="selectFac(this, '${f.name}')">${f.name} (${f.fee})</div>`).join('');
 </script>
 </body>
 </html>
